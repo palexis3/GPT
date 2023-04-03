@@ -8,15 +8,15 @@ import com.example.gpt.data.repository.chat.ChatRepository
 import com.example.gpt.utils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import com.example.gpt.utils.Result
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 sealed interface ChatMessageUiState {
     object Loading : ChatMessageUiState
     object Error : ChatMessageUiState
+    object Uninitialized : ChatMessageUiState
     data class Success(val chatMessage: ChatMessage) : ChatMessageUiState
 }
 
@@ -26,8 +26,8 @@ class ChatViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _chatMessageUiState =
-        MutableStateFlow<ChatMessageUiState>(ChatMessageUiState.Loading)
-    val chatMessageUiState = _chatMessageUiState.asStateFlow()
+        Channel<ChatMessageUiState>(Channel.BUFFERED)
+    val chatMessageUiState get() = _chatMessageUiState.receiveAsFlow()
 
     fun getChatMessage(message: String, temperature: Int = 1) {
         val request = ChatCompletionRequest(
@@ -48,7 +48,7 @@ class ChatViewModel @Inject constructor(
                         }
                     }
 
-                    _chatMessageUiState.update { chatMessageUiState }
+                    _chatMessageUiState.send(chatMessageUiState)
                 }
         }
     }

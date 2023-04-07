@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -25,7 +24,7 @@ val dotSize = 12.dp // made it bigger for demo
 const val delayUnit = 300 // you can change delay to change animation speed
 
 @Composable
-fun DotsTyping() {
+fun DotsTyping(modifier: Modifier) {
     val maxOffset = 10f
 
     @Composable
@@ -36,7 +35,7 @@ fun DotsTyping() {
             .size(dotSize)
             .offset(y = -offset.dp)
             .background(
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.surface,
                 shape = CircleShape
             )
     )
@@ -64,7 +63,7 @@ fun DotsTyping() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(top = maxOffset.dp)
+        modifier = modifier
     ) {
         val spaceSize = 2.dp
 

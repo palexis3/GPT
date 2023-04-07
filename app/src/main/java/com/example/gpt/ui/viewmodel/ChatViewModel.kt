@@ -28,7 +28,8 @@ class ChatViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _chatMessageUiState = MutableStateFlow<ChatMessageUiState>(ChatMessageUiState.Uninitialized)
-    val chatMessageUiState get() = _chatMessageUiState.asStateFlow()
+    val chatMessageUiState
+        get() = _chatMessageUiState.asStateFlow()
 
     fun getChatMessage(message: String, temperature: Double = 1.0) {
         val request = ChatCompletionRequest(
@@ -49,7 +50,7 @@ class ChatViewModel @Inject constructor(
                             ChatMessageUiState.Success(data)
                         }
                     }
-                    delay(1000L)
+                    delay(500L)
                     _chatMessageUiState.update { chatMessageUiState }
                 }
         }

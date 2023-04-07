@@ -9,8 +9,10 @@ import com.example.gpt.utils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.example.gpt.utils.Result
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed interface ChatMessageUiState {
@@ -25,13 +27,13 @@ class ChatViewModel @Inject constructor(
     private val chatRepository: ChatRepository
 ) : ViewModel() {
 
-    private val _chatMessageUiState =
-        Channel<ChatMessageUiState>(Channel.BUFFERED)
-    val chatMessageUiState get() = _chatMessageUiState.receiveAsFlow()
+    private val _chatMessageUiState = MutableStateFlow<ChatMessageUiState>(ChatMessageUiState.Uninitialized)
+    val chatMessageUiState get() = _chatMessageUiState.asStateFlow()
 
-    fun getChatMessage(message: String, temperature: Int = 1) {
+    fun getChatMessage(message: String, temperature: Double = 1.0) {
         val request = ChatCompletionRequest(
-            messages = listOf(ChatMessage(role = "user", content = message))
+            messages = listOf(ChatMessage(role = "user", content = message)),
+            temperature = temperature
         )
 
         viewModelScope.launch {
@@ -47,9 +49,15 @@ class ChatViewModel @Inject constructor(
                             ChatMessageUiState.Success(data)
                         }
                     }
-
-                    _chatMessageUiState.send(chatMessageUiState)
+                    delay(1000L)
+                    _chatMessageUiState.update { chatMessageUiState }
                 }
+        }
+    }
+
+    fun resetMessageUi() {
+        viewModelScope.launch {
+            _chatMessageUiState.update { ChatMessageUiState.Uninitialized }
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.gpt.utils
+package com.example.gpt.ui.composable
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
@@ -13,11 +13,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
+// Typewriter text inspired and tweaked from: https://gist.github.com/EugeneTheDev/a27664cb7e7899f964348b05883cbccd
 @Composable
 fun TypeWriter(
     text: String,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle(),
+    typeWriterSeenAlready: Boolean = false,
     typistSpeed: Long = 5L,
     onAnimationEnd: (() -> Unit)? = null
 ) {
@@ -46,8 +48,14 @@ fun TypeWriter(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // If the type writer animation has already been seen, don't show it again. Else,
+        // show the passed in text string as a typical text.
         Text(
-            text = currentText.value,
+            text = if (typeWriterSeenAlready) {
+                text
+            } else {
+                currentText.value
+            },
             style = textStyle,
         )
     }

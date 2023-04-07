@@ -1,5 +1,10 @@
 package com.example.gpt.data.model
 
-interface Message
+import java.util.UUID
 
-object LoadingMessage: Message
+interface Message {
+    val id : String
+        get() = UUID.randomUUID().toString()
+}
+
+object LoadingMessage : Message

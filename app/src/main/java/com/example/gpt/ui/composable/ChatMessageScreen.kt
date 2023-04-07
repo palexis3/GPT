@@ -1,6 +1,6 @@
 package com.example.gpt.ui.composable
 
-import android.widget.Space
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,11 +34,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,8 +51,6 @@ import com.example.gpt.data.model.chat.ChatMessage
 import com.example.gpt.ui.theme.MediumPadding
 import com.example.gpt.ui.viewmodel.ChatMessageUiState
 import com.example.gpt.ui.viewmodel.ChatViewModel
-import com.example.gpt.utils.DotsTyping
-import com.example.gpt.utils.TypeWriter
 
 
 @OptIn(
@@ -63,28 +62,31 @@ import com.example.gpt.utils.TypeWriter
 fun ChatMessageScreen(
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     var inputString by remember { mutableStateOf("") }
     val messageList = remember { mutableStateListOf<Message>() }
 
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val chatMessageUiState: ChatMessageUiState by chatViewModel.chatMessageUiState.collectAsStateWithLifecycle()
 
-    val chatMessageUiState: ChatMessageUiState by chatViewModel.chatMessageUiState.collectAsStateWithLifecycle(
-        ChatMessageUiState.Uninitialized
-    )
-
-    processChatMessageUi(
-        chatMessageUiState,
-        onProcessed = { chatMessage ->
-            if (messageList.last() is LoadingMessage) {
-                messageList.removeLast()
+    LaunchedEffect(key1 = chatMessageUiState) {
+        processChatMessageUi(
+            chatMessageUiState,
+            onProcessed = { chatMessage ->
+                if (messageList.last() is LoadingMessage) {
+                    messageList.removeLast()
+                }
+                messageList.add(chatMessage)
+            },
+            onLoading = {
+                messageList.add(LoadingMessage)
             }
-            messageList.add(chatMessage)
-        },
-        onLoading = {
-            messageList.add(LoadingMessage)
-        }
-    )
+        )
+    }
 
+    LaunchedEffect(messageList.size) {
+        // TODO: Automatically show the most recent item in list (bottom)
+    }
 
     Column(
         modifier = Modifier
@@ -96,7 +98,7 @@ fun ChatMessageScreen(
             items(items = messageList) { message ->
                 when (message) {
                     is ChatMessage -> ShowMessage(chatMessage = message)
-                    LoadingMessage -> ShowLoading()
+                    is LoadingMessage -> ShowLoading()
                 }
             }
         }
@@ -116,13 +118,13 @@ fun ChatMessageScreen(
             )
 
             IconButton(onClick = {
-                if (inputString.isNotEmpty()) {
+                if (inputString.trim().isNotEmpty()) {
                     val chatMessage = ChatMessage(role = "user", inputString)
                     messageList.add(chatMessage)
                     keyboardController?.hide()
-                    chatViewModel.getChatMessage(inputString)
-//                    chatViewModel.resetChatMessageFlow()
+                    chatViewModel.getChatMessage(inputString.trim())
                     inputString = ""
+                    chatViewModel.resetMessageUi()
                 }
             }) {
                 Icon(
@@ -143,11 +145,11 @@ fun processChatMessageUi(
         is ChatMessageUiState.Success -> {
             onProcessed(chatMessageUiState.chatMessage)
         }
-        is ChatMessageUiState.Error -> {
+        ChatMessageUiState.Error -> {
             onProcessed(ChatMessage(role = "error", ""))
         }
-        is ChatMessageUiState.Uninitialized -> {}
-        else -> onLoading.invoke()
+        ChatMessageUiState.Loading -> onLoading()
+        else -> {}
     }
 }
 
@@ -158,17 +160,20 @@ fun ShowLoading() {
         horizontalAlignment = Alignment.End
     ) {
         Card(
-            modifier = Modifier.width(175.dp).weight(1f),
+            modifier = Modifier
+                .width(200.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
+                defaultElevation = 8.dp
             ),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(12.dp)
         ) {
             Row(
-                modifier = Modifier.padding(12.dp).weight(1f),
+                modifier = Modifier
+                    .padding(12.dp)
+                    .weight(1f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -185,9 +190,9 @@ fun ShowMessage(chatMessage: ChatMessage) {
     val isChatAssistant = chatMessage.role == "assistant"
     val isErrorMessage = chatMessage.role == "error"
 
-    val backgroundColor = when {
+    val cardBackgroundColor = when {
         isUser -> MaterialTheme.colorScheme.primaryContainer
-        isChatAssistant -> MaterialTheme.colorScheme.tertiaryContainer
+        isChatAssistant -> MaterialTheme.colorScheme.secondaryContainer
         else -> MaterialTheme.colorScheme.errorContainer
     }
 
@@ -199,14 +204,14 @@ fun ShowMessage(chatMessage: ChatMessage) {
         }
     ) {
         Card(
-            modifier = Modifier.widthIn(250.dp, 300.dp),
+            modifier = Modifier.widthIn(200.dp, 270.dp).padding(4.dp),
             colors = CardDefaults.cardColors(
-                containerColor = backgroundColor
+                containerColor = cardBackgroundColor
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
+                defaultElevation = 8.dp
             ),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(12.dp)
         ) {
             val message = if (isErrorMessage) {
                 stringResource(id = R.string.error)
@@ -221,33 +226,42 @@ fun ShowMessage(chatMessage: ChatMessage) {
                         isChatAssistant || isErrorMessage -> stringResource(id = R.string.gpt)
                         else -> stringResource(id = R.string.you)
                     },
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.tertiary,
                     fontSize = 10.sp,
-                    fontStyle = FontStyle.Italic
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.SemiBold
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
                 if (isChatAssistant || isErrorMessage) {
+                    var typeWriterSeenAlready by remember { mutableStateOf(false) }
+
                     TypeWriter(
                         text = message,
-                        modifier = Modifier.padding(12.dp),
+                        modifier = Modifier.padding(start = 12.dp, top = 4.dp, bottom = 6.dp, end = 12.dp),
                         textStyle = TextStyle(
                             color = when {
-                                isChatAssistant -> MaterialTheme.colorScheme.tertiary
+                                isChatAssistant -> MaterialTheme.colorScheme.secondary
                                 else -> MaterialTheme.colorScheme.error
-                            }
-                        )
+                            },
+                            fontSize = 18.sp
+                        ),
+                        onAnimationEnd = {
+                            typeWriterSeenAlready = true
+                        },
+                        typeWriterSeenAlready = typeWriterSeenAlready
                     )
                 } else {
                     Text(
                         text = message,
-                        modifier = Modifier.padding(12.dp),
-                        color = MaterialTheme.colorScheme.primary
+                        modifier = Modifier.padding(start = 12.dp, top = 4.dp, bottom = 6.dp, end = 12.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 18.sp
                     )
                 }
             }
         }
     }
-    Spacer(Modifier.height(4.dp))
+    Spacer(Modifier.height(8.dp))
 }

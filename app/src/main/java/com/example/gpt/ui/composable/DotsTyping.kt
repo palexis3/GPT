@@ -1,4 +1,4 @@
-package com.example.gpt.utils
+package com.example.gpt.ui.composable
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat

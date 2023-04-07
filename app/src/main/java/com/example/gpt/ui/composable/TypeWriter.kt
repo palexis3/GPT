@@ -13,13 +13,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
-// Typewriter text inspired and tweaked from: https://gist.github.com/EugeneTheDev/a27664cb7e7899f964348b05883cbccd
+// Typewriter text inspired and tweaked from: https://github.com/zeeshanali-k/Typist
 @Composable
 fun TypeWriter(
     text: String,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle(),
-    typeWriterSeenAlready: Boolean = false,
+    typeWriterSeenAlready: Boolean,
     typistSpeed: Long = 5L,
     onAnimationEnd: (() -> Unit)? = null
 ) {

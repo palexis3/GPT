@@ -16,7 +16,6 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
-import okhttp3.logging.HttpLoggingInterceptor
 import okio.Buffer
 import okio.IOException
 import retrofit2.Retrofit
@@ -36,13 +35,11 @@ object NetworkModule {
             .addLast(KotlinJsonAdapterFactory())
             .build()
 
-        val loggingInterceptor: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-
         val client: OkHttpClient = OkHttpClient.Builder().apply {
             addInterceptor(AuthInterceptor())
-            addInterceptor(LoggingInterceptor())
+            if (BuildConfig.DEBUG) {
+                addInterceptor(LoggingInterceptor())
+            }
             retryOnConnectionFailure(true)
             connectTimeout(100, TimeUnit.SECONDS)
         }.build()

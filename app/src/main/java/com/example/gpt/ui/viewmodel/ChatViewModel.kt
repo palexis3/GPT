@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gpt.data.model.chat.ChatCompletionRequest
 import com.example.gpt.data.model.chat.ChatMessage
+import com.example.gpt.data.model.chat.ChatMessageUi
 import com.example.gpt.data.repository.chat.ChatRepository
 import com.example.gpt.utils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,7 @@ sealed interface ChatMessageUiState {
     object Loading : ChatMessageUiState
     object Error : ChatMessageUiState
     object Uninitialized : ChatMessageUiState
-    data class Success(val chatMessage: ChatMessage) : ChatMessageUiState
+    data class Success(val chatMessageUi: ChatMessageUi) : ChatMessageUiState
 }
 
 @HiltViewModel
@@ -47,10 +48,11 @@ class ChatViewModel @Inject constructor(
                         is Result.Error -> ChatMessageUiState.Error
                         is Result.Success -> {
                             val data = result.data
-                            ChatMessageUiState.Success(data)
+                            val chatMessageUi = ChatMessageUi(role = data.role, content = data.content)
+                            ChatMessageUiState.Success(chatMessageUi)
                         }
                     }
-                    delay(500L)
+                    delay(100L)
                     _chatMessageUiState.update { chatMessageUiState }
                 }
         }

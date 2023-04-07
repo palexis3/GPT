@@ -20,11 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-val dotSize = 12.dp // made it bigger for demo
-const val delayUnit = 300 // you can change delay to change animation speed
+val dotSize = 12.dp
+const val delayUnit = 300
 
+// Dots loading inspired by https://gist.github.com/EugeneTheDev/a27664cb7e7899f964348b05883cbccd
 @Composable
-fun DotsTyping(modifier: Modifier) {
+fun DotsLoading(modifier: Modifier) {
     val maxOffset = 10f
 
     @Composable

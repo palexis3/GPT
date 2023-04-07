@@ -1,6 +1,5 @@
 package com.example.gpt.ui.composable
 
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,9 +47,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gpt.R
-import com.example.gpt.data.model.LoadingMessage
-import com.example.gpt.data.model.Message
-import com.example.gpt.data.model.chat.ChatMessage
+import com.example.gpt.data.model.LoadingMessageUi
+import com.example.gpt.data.model.MessageUi
+import com.example.gpt.data.model.chat.ChatMessageUi
 import com.example.gpt.ui.theme.MediumPadding
 import com.example.gpt.ui.viewmodel.ChatMessageUiState
 import com.example.gpt.ui.viewmodel.ChatViewModel
@@ -70,7 +69,7 @@ fun ChatMessageScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var inputString by remember { mutableStateOf("") }
-    val messageList = remember { mutableStateListOf<Message>() }
+    val messageList = remember { mutableStateListOf<MessageUi>() }
 
     val messageListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -81,13 +80,13 @@ fun ChatMessageScreen(
         processChatMessageUi(
             chatMessageUiState,
             onProcessed = { chatMessage ->
-                if (messageList.last() is LoadingMessage) {
+                if (messageList.last() is LoadingMessageUi) {
                     messageList.removeLast()
                 }
                 messageList.add(chatMessage)
             },
             onLoading = {
-                messageList.add(LoadingMessage)
+                messageList.add(LoadingMessageUi)
             }
         )
     }
@@ -95,7 +94,7 @@ fun ChatMessageScreen(
     LaunchedEffect(messageList.size) {
         if (messageList.size > 0) {
             coroutineScope.launch {
-                delay(100L)
+                delay(10L)
                 messageListState.animateScrollToItem(messageList.size - 1)
             }
         }
@@ -112,12 +111,11 @@ fun ChatMessageScreen(
             state = messageListState
         ) {
             items(
-                items = messageList,
-                key = { item: Message -> item.hashCode() }
+                items = messageList
             ) { message ->
                 when (message) {
-                    is ChatMessage -> ShowMessage(chatMessage = message)
-                    is LoadingMessage -> ShowLoading()
+                    is ChatMessageUi -> ShowMessage(chatMessageUi = message)
+                    is LoadingMessageUi -> ShowLoading()
                 }
             }
         }
@@ -138,7 +136,7 @@ fun ChatMessageScreen(
 
             IconButton(onClick = {
                 if (inputString.trim().isNotEmpty()) {
-                    val chatMessage = ChatMessage(role = "user", inputString)
+                    val chatMessage = ChatMessageUi(role = "user", inputString)
                     messageList.add(chatMessage)
                     keyboardController?.hide()
                     chatViewModel.getChatMessage(inputString.trim())
@@ -157,15 +155,15 @@ fun ChatMessageScreen(
 
 private fun processChatMessageUi(
     chatMessageUiState: ChatMessageUiState,
-    onProcessed: (ChatMessage) -> Unit,
+    onProcessed: (ChatMessageUi) -> Unit,
     onLoading: () -> Unit
 ) {
     when (chatMessageUiState) {
         is ChatMessageUiState.Success -> {
-            onProcessed(chatMessageUiState.chatMessage)
+            onProcessed(chatMessageUiState.chatMessageUi)
         }
         ChatMessageUiState.Error -> {
-            onProcessed(ChatMessage(role = "error", ""))
+            onProcessed(ChatMessageUi(role = "error", ""))
         }
         ChatMessageUiState.Loading -> onLoading()
         else -> {}
@@ -194,7 +192,7 @@ fun ShowLoading() {
                 text = stringResource(id = R.string.gpt)
             )
             Spacer(modifier = Modifier.height(10.dp))
-            DotsTyping(
+            DotsLoading(
                 modifier = Modifier.padding(
                     start = 12.dp,
                     top = 8.dp,
@@ -219,10 +217,10 @@ fun ShowCardHeader(text: String) {
 }
 
 @Composable
-fun ShowMessage(chatMessage: ChatMessage) {
-    val isUser = chatMessage.role == "user"
-    val isChatAssistant = chatMessage.role == "assistant"
-    val isErrorMessage = chatMessage.role == "error"
+fun ShowMessage(chatMessageUi: ChatMessageUi) {
+    val isUser = chatMessageUi.role == "user"
+    val isChatAssistant = chatMessageUi.role == "assistant"
+    val isErrorMessage = chatMessageUi.role == "error"
 
     val cardBackgroundColor = when {
         isUser -> MaterialTheme.colorScheme.primaryContainer
@@ -252,7 +250,7 @@ fun ShowMessage(chatMessage: ChatMessage) {
             val message = if (isErrorMessage) {
                 stringResource(id = R.string.error)
             } else {
-                chatMessage.content
+                chatMessageUi.content
             }
 
             Column {
@@ -266,8 +264,6 @@ fun ShowMessage(chatMessage: ChatMessage) {
                 Spacer(modifier = Modifier.height(2.dp))
 
                 if (isChatAssistant || isErrorMessage) {
-                    var typeWriterSeenAlready by remember { mutableStateOf(false) }
-
                     TypeWriter(
                         text = message,
                         modifier = Modifier.padding(
@@ -284,9 +280,9 @@ fun ShowMessage(chatMessage: ChatMessage) {
                             fontSize = 18.sp
                         ),
                         onAnimationEnd = {
-                            typeWriterSeenAlready = true
+                            chatMessageUi.typeWriterSeenAlready = true
                         },
-                        typeWriterSeenAlready = typeWriterSeenAlready
+                        typeWriterSeenAlready = chatMessageUi.typeWriterSeenAlready
                     )
                 } else {
                     Text(

@@ -1,5 +1,6 @@
 package com.example.gpt.ui.composable
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,7 +15,9 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Card
@@ -36,6 +39,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -53,7 +59,6 @@ import com.example.gpt.data.model.chat.ChatMessageUi
 import com.example.gpt.ui.theme.MediumPadding
 import com.example.gpt.ui.viewmodel.ChatMessageUiState
 import com.example.gpt.ui.viewmodel.ChatViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -91,10 +96,11 @@ fun ChatMessageScreen(
         )
     }
 
+    var scrollToPosition by remember { mutableStateOf(0F) }
+
     LaunchedEffect(messageList.size) {
         if (messageList.size > 0) {
             coroutineScope.launch {
-                delay(10L)
                 messageListState.animateScrollToItem(messageList.size - 1)
             }
         }
@@ -103,18 +109,25 @@ fun ChatMessageScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(MediumPadding),
         verticalArrangement = Arrangement.Bottom
     ) {
         LazyColumn(
-            modifier = Modifier.weight(1f).animateContentSize(),
+            modifier = Modifier
+                .weight(1f)
+                .animateContentSize(),
             state = messageListState
         ) {
             items(
                 items = messageList
             ) { message ->
                 when (message) {
-                    is ChatMessageUi -> ShowMessage(chatMessageUi = message)
+                    is ChatMessageUi -> ShowMessage(
+                        chatMessageUi = message,
+                        currentYPosition = { position -> },
+                        dynamicMessageHeight = { heightChange -> }
+                    )
                     is LoadingMessageUi -> ShowLoading()
                 }
             }
@@ -217,7 +230,11 @@ fun ShowCardHeader(text: String) {
 }
 
 @Composable
-fun ShowMessage(chatMessageUi: ChatMessageUi) {
+fun ShowMessage(
+    chatMessageUi: ChatMessageUi,
+    currentYPosition: (Float) -> Unit,
+    dynamicMessageHeight: (Int) -> Unit
+) {
     val isUser = chatMessageUi.role == "user"
     val isChatAssistant = chatMessageUi.role == "assistant"
     val isErrorMessage = chatMessageUi.role == "error"
@@ -238,7 +255,13 @@ fun ShowMessage(chatMessageUi: ChatMessageUi) {
         Card(
             modifier = Modifier
                 .widthIn(200.dp, 275.dp)
-                .padding(4.dp),
+                .padding(4.dp)
+                .onGloballyPositioned { layoutCoordinates ->
+                    currentYPosition(layoutCoordinates.positionInParent().y)
+                }
+                .onSizeChanged { size ->
+                    dynamicMessageHeight(size.height)
+                },
             colors = CardDefaults.cardColors(
                 containerColor = cardBackgroundColor
             ),

@@ -1,11 +1,12 @@
 package com.example.gpt.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
 
+val MediumPadding = 12.dp
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -73,18 +74,11 @@ private val DarkColors = darkColorScheme(
 )
 
 @Composable
-fun GPTTheme(
-  useDarkTheme: Boolean = isSystemInDarkTheme(),
-  content: @Composable() () -> Unit
+fun GptTheme(
+  content: @Composable () -> Unit
 ) {
-  val colors = if (!useDarkTheme) {
-    LightColors
-  } else {
-    DarkColors
-  }
-
   MaterialTheme(
-    colorScheme = colors,
+    colorScheme = DarkColors,
     content = content
   )
 }

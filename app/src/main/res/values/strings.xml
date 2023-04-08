@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">GPT</string>
+    <string name="send">Type in prompt.</string>
+    <string name="error">Error. Please try again</string>
+    <string name="you">You</string>
+    <string name="gpt">GPT</string>
 </resources>

@@ -58,7 +58,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun resetMessageUi() {
+    fun resetMessageUiFlow() {
         viewModelScope.launch {
             _chatMessageUiState.update { ChatMessageUiState.Uninitialized }
         }

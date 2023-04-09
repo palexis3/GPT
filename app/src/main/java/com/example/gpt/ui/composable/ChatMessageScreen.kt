@@ -1,6 +1,5 @@
 package com.example.gpt.ui.composable
 
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -154,7 +153,7 @@ fun ChatMessageScreen(
                     keyboardController?.hide()
                     chatViewModel.getChatMessage(inputString.trim())
                     inputString = ""
-                    chatViewModel.resetMessageUi()
+                    chatViewModel.resetMessageUiFlow()
                 }
             }) {
                 Icon(

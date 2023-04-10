@@ -10,16 +10,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,10 +41,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,6 +73,10 @@ fun ImageMessageScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var query by remember { mutableStateOf("") }
+    var savedQuery by remember { mutableStateOf("") }
+
+    var dropdownExpanded by remember { mutableStateOf(false) }
+    var selectedNum by remember { mutableStateOf(1) }
 
     val imageMessageUiState: ImageMessageUiState by imageViewModel.imageMessageUiState.collectAsStateWithLifecycle()
 
@@ -74,11 +84,7 @@ fun ImageMessageScreen(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             TextField(
                 modifier = Modifier
                     .background(
@@ -92,12 +98,14 @@ fun ImageMessageScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 onValueChange = { query = it },
                 colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent),
-                placeholder = { Text(
-                    stringResource(id = R.string.search_image),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Color.DarkGray,
-                    fontStyle = FontStyle.Italic
-                ) },
+                placeholder = {
+                    Text(
+                        stringResource(id = R.string.image_prompt),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.DarkGray,
+                        fontStyle = FontStyle.Italic
+                    )
+                },
                 trailingIcon = {
                     if (query.isNotEmpty()) {
                         IconButton(onClick = { query = "" }) {
@@ -110,32 +118,86 @@ fun ImageMessageScreen(
                     }
                 }
             )
+        }
 
+        Row(
+            modifier = Modifier.padding(MediumPadding),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             if (query.trim().isNotEmpty()) {
-                IconButton(
+                ExposedDropdownMenuBox(
+                    modifier = Modifier.weight(1f),
+                    expanded = dropdownExpanded,
+                    onExpandedChange = { dropdownExpanded = !dropdownExpanded }
+                ) {
+                    TextField(
+                        modifier = Modifier
+                            .menuAnchor(),
+                        value = selectedNum.toString(),
+                        onValueChange = {},
+                        readOnly = true,
+                        label = {
+                            Text(
+                                stringResource(id = R.string.num_of_image),
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded) },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        )
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = dropdownExpanded,
+                        onDismissRequest = { dropdownExpanded = false }
+                    ) {
+                        (1..10).forEach { item ->
+                            DropdownMenuItem(
+                                text = { Text(text = item.toString()) },
+                                onClick = {
+                                    selectedNum = item
+                                    dropdownExpanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Button(
                     onClick = {
                         keyboardController?.hide()
-                        imageViewModel.getImages(query.trim())
+                        imageViewModel.getImages(query.trim(), selectedNum)
+                        savedQuery = query
                         query = ""
                         imageViewModel.resetImageUiFlow()
-                    }) {
-                    Icon(
-                        imageVector = Icons.Rounded.Search,
-                        tint = MaterialTheme.colorScheme.onBackground,
-                        contentDescription = stringResource(id = R.string.send)
-                    )
+                    }
+                ) {
+                    Text(text = stringResource(id = R.string.search_image))
                 }
             }
         }
 
         Spacer(Modifier.height(6.dp))
 
-        ImageListState(imageMessageUiState)
+        ImageListState(
+            imageMessageUiState,
+            savedQuery
+        )
     }
 }
 
 @Composable
-fun ImageListState(imageMessageUiState: ImageMessageUiState) {
+fun ImageListState(
+    imageMessageUiState: ImageMessageUiState,
+    savedQuery: String
+) {
     LazyColumn(
         verticalArrangement = Arrangement.SpaceEvenly,
         contentPadding = PaddingValues(
@@ -154,6 +216,10 @@ fun ImageListState(imageMessageUiState: ImageMessageUiState) {
             }
             is ImageMessageUiState.Error -> {
                 item {
+                    ShowQueryText(text = savedQuery)
+                }
+                item {
+                    // TODO: Wrap in card with padding
                     TypeWriter(
                         text = stringResource(id = R.string.error),
                         modifier = Modifier.padding(
@@ -170,12 +236,28 @@ fun ImageListState(imageMessageUiState: ImageMessageUiState) {
                 }
             }
             is ImageMessageUiState.Success -> {
+                item {
+                    ShowQueryText(text = savedQuery)
+                }
                 items(imageMessageUiState.imageMessageUi.images) { imageUrl ->
                     ShowImage(url = imageUrl)
                 }
             }
         }
     }
+}
+
+@Composable
+fun ShowQueryText(text: String) {
+    val context = LocalContext.current
+
+    Text(
+        text = context.getString(R.string.images_for, text),
+        modifier = Modifier.padding(MediumPadding),
+        style = MaterialTheme.typography.titleMedium,
+        color = Color.White,
+        fontStyle = FontStyle.Italic
+    )
 }
 
 @Composable

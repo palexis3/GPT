@@ -32,7 +32,7 @@ class ImageViewModel @Inject constructor(
     val imageMessageUiState
         get() = _imageMessageUiState.asStateFlow()
 
-    fun getImages(prompt: String, numOf: Int) {
+    fun getImages(prompt: String, numOf: Int = 1) {
         val request = CreateImageRequest(
             prompt = prompt, n = numOf
         )

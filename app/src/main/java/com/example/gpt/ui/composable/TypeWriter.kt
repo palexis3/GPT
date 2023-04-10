@@ -19,7 +19,7 @@ fun TypeWriter(
     text: String,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle(),
-    typeWriterSeenAlready: Boolean,
+    typeWriterSeenAlready: Boolean = false,
     typistSpeed: Long = 5L,
     onAnimationEnd: (() -> Unit)? = null
 ) {

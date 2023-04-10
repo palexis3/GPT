@@ -4,4 +4,5 @@
     <string name="error">Error. Please try again</string>
     <string name="you">You</string>
     <string name="gpt">GPT</string>
+    <string name="search_image">Type description for image</string>
 </resources>

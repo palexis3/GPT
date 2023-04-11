@@ -4,4 +4,8 @@
     <string name="error">Error. Please try again</string>
     <string name="you">You</string>
     <string name="gpt">GPT</string>
+    <string name="image_prompt">Type description for image</string>
+    <string name="search_image">Search Image</string>
+    <string name="num_of_image">Number of images</string>
+    <string name="images_for">Image results for: %s</string>
 </resources>

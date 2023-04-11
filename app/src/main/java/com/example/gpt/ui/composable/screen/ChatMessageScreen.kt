@@ -1,6 +1,5 @@
-package com.example.gpt.ui.composable
+package com.example.gpt.ui.composable.screen
 
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -45,8 +43,6 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -56,6 +52,9 @@ import com.example.gpt.R
 import com.example.gpt.data.model.LoadingMessageUi
 import com.example.gpt.data.model.MessageUi
 import com.example.gpt.data.model.chat.ChatMessageUi
+import com.example.gpt.ui.composable.ShowCardHeader
+import com.example.gpt.ui.composable.ShowLoading
+import com.example.gpt.ui.composable.TypeWriter
 import com.example.gpt.ui.theme.MediumPadding
 import com.example.gpt.ui.viewmodel.ChatMessageUiState
 import com.example.gpt.ui.viewmodel.ChatViewModel
@@ -154,7 +153,7 @@ fun ChatMessageScreen(
                     keyboardController?.hide()
                     chatViewModel.getChatMessage(inputString.trim())
                     inputString = ""
-                    chatViewModel.resetMessageUi()
+                    chatViewModel.resetMessageUiFlow()
                 }
             }) {
                 Icon(
@@ -181,52 +180,6 @@ private fun processChatMessageUi(
         ChatMessageUiState.Loading -> onLoading()
         else -> {}
     }
-}
-
-@Composable
-fun ShowLoading() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.End
-    ) {
-        Card(
-            modifier = Modifier
-                .width(200.dp)
-                .padding(4.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
-            ),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            ShowCardHeader(
-                text = stringResource(id = R.string.gpt)
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            DotsLoading(
-                modifier = Modifier.padding(
-                    start = 12.dp,
-                    top = 8.dp,
-                    bottom = 6.dp,
-                    end = 12.dp
-                )
-            )
-        }
-    }
-}
-
-@Composable
-fun ShowCardHeader(text: String) {
-    Text(
-        modifier = Modifier.padding(start = 12.dp, top = 4.dp),
-        text = text,
-        color = MaterialTheme.colorScheme.tertiary,
-        fontSize = 10.sp,
-        fontStyle = FontStyle.Italic,
-        fontWeight = FontWeight.SemiBold
-    )
 }
 
 @Composable

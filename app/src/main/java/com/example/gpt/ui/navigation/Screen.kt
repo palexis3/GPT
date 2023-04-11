@@ -1,9 +1,11 @@
 package com.example.gpt.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.List
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.annotation.DrawableRes
+import com.example.gpt.R
 
-sealed class Screen(val route: String, val iconId: ImageVector) {
-    object Chat : Screen("chat", Icons.Outlined.List)
+sealed class Screen(val route: String, @DrawableRes val icon: Int) {
+    object Chat : Screen("chat", R.drawable.question_answer_icon)
+    object Image : Screen("image", R.drawable.image_icon)
+    object Audio : Screen("audio", R.drawable.audio_icon)
+    object Settings : Screen("settings", R.drawable.settings_icon)
 }

@@ -1,6 +1,7 @@
 package com.example.gpt.ui.composable.screen
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,11 +14,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,12 +39,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -108,7 +114,6 @@ fun ChatMessageScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
             .padding(MediumPadding),
         verticalArrangement = Arrangement.Bottom
     ) {
@@ -135,31 +140,58 @@ fun ChatMessageScreen(
         Spacer(Modifier.height(6.dp))
 
         Row(
-            Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                        shape = RectangleShape
+                    )
+                    .padding(MediumPadding)
+                    .weight(1f),
                 value = inputString,
+                textStyle = MaterialTheme.typography.titleMedium,
+                colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 onValueChange = { inputString = it },
-                label = { Text(stringResource(id = R.string.send)) }
+                placeholder = {
+                    Text(
+                        stringResource(id = R.string.chat_prompt),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.DarkGray,
+                        fontStyle = FontStyle.Italic
+                    )
+                },
+                trailingIcon = {
+                    if (inputString.isNotEmpty()) {
+                        IconButton(onClick = { inputString = "" }) {
+                            Icon(
+                                imageVector = Icons.Rounded.Clear,
+                                tint = MaterialTheme.colorScheme.onBackground,
+                                contentDescription = "Clear Icon"
+                            )
+                        }
+                    }
+                }
             )
 
-            IconButton(onClick = {
-                if (inputString.trim().isNotEmpty()) {
+            if (inputString.trim().isNotEmpty()) {
+                IconButton(onClick = {
                     val chatMessage = ChatMessageUi(role = "user", inputString)
                     messageList.add(chatMessage)
                     keyboardController?.hide()
                     chatViewModel.getChatMessage(inputString.trim())
                     inputString = ""
                     chatViewModel.resetMessageUiFlow()
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Send,
+                        contentDescription = "Send"
+                    )
                 }
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Send,
-                    contentDescription = stringResource(id = R.string.send)
-                )
             }
         }
     }

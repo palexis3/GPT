@@ -62,7 +62,6 @@ fun AudioMessageScreen(
             if (success) {
                 startRecording(
                     recorderOnCalled = { mediaRecorder ->
-                        Log.d("XXX-AudioMessageScreen", "startRecording recorderOnCalled: $mediaRecorder recorder: $recorder")
                         if (recorder == null) {
                             recorder = mediaRecorder
                         }
@@ -88,7 +87,6 @@ fun AudioMessageScreen(
                 if (shouldPlay) {
                     startPlaying(
                         playerOnCalled = { mediaPlayer ->
-                            Log.d("XXX-AudioMessageScreen", "startPlaying playerOnCalled: $mediaPlayer player: $player")
                             if (player == null) {
                                 player = mediaPlayer
                             }
@@ -113,7 +111,6 @@ fun AudioMessageScreen(
                                 if (recorder == null) {
                                     recorder = mediaRecorder
                                 }
-                                Log.d("XXX-AudioMessageScreen", "startRecording recorderOnCalled: $mediaRecorder recorder: $recorder")
                             },
                             file.path,
                             context
@@ -133,8 +130,11 @@ private fun startPlaying(playerOnCalled: (MediaPlayer) -> Unit, dataSource: Stri
         MediaPlayer().apply {
             try {
                 setDataSource(dataSource)
-                prepare()
-                start()
+                // TODO: Add more of MediaPlayer's listeners to capture errors
+                setOnPreparedListener { mediaPlayer ->
+                    mediaPlayer.start()
+                }
+                prepareAsync()
             } catch (e: IOException) {
                 Timber.d("startPlaying failed exception: $e")
             }

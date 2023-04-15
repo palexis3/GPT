@@ -8,11 +8,11 @@ import java.util.Locale
 
 fun Context.createImageFile(): File {
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    val imageFileName = "mp4" + timeStamp + "_"
+    val imageFileName = "mp3" + timeStamp + "_"
 
     return File.createTempFile(
         imageFileName,
-        ".mp4",
+        ".mp3",
         externalCacheDir
     )
 }

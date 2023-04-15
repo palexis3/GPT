@@ -21,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.gpt.ui.composable.screen.AudioMessageScreen
 import com.example.gpt.ui.composable.screen.ChatMessageScreen
 import com.example.gpt.ui.composable.screen.ImageMessageScreen
 import com.example.gpt.ui.navigation.Screen
@@ -46,7 +47,7 @@ fun ShowApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    val bottomNavItems = listOf(Screen.Chat, Screen.Image)
+    val bottomNavItems = listOf(Screen.Chat, Screen.Image, Screen.Audio)
 
     Surface(
         color = MaterialTheme.colorScheme.background
@@ -77,6 +78,7 @@ fun ShowApp() {
             ) {
                 composable(Screen.Chat.route) { ChatMessageScreen() }
                 composable(Screen.Image.route) { ImageMessageScreen() }
+                composable(Screen.Audio.route) { AudioMessageScreen() }
             }
         }
     }

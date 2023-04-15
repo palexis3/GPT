@@ -1,6 +1,5 @@
 package com.example.gpt.data.repository.chat
 
-import android.util.Log
 import com.example.gpt.data.model.chat.ChatCompletionRequest
 import com.example.gpt.data.model.chat.ChatMessage
 import com.example.gpt.data.remote.OpenAIApi

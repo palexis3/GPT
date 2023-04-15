@@ -1,5 +1,7 @@
 package com.example.gpt.data.repository
 
+import com.example.gpt.data.repository.audio.AudioRepository
+import com.example.gpt.data.repository.audio.AudioRepositoryImpl
 import com.example.gpt.data.repository.chat.ChatRepository
 import com.example.gpt.data.repository.chat.ChatRepositoryImpl
 import com.example.gpt.data.repository.image.ImageRepository
@@ -20,4 +22,8 @@ interface RepositoryModule {
     @Binds
     @ViewModelScoped
     fun bindImageRepository(imageRepositoryImpl: ImageRepositoryImpl): ImageRepository
+
+    @Binds
+    @ViewModelScoped
+    fun bindAudioRepository(audioRepositoryImpl: AudioRepositoryImpl) : AudioRepository
 }

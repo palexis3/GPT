@@ -8,4 +8,6 @@
     <string name="search_image">Search Image</string>
     <string name="num_of_image">Number of images</string>
     <string name="images_for">Image results for: %s</string>
+
+    <string name="audio_permission_denied">Audio permission has been denied.</string>
 </resources>

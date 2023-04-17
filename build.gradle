@@ -17,6 +17,7 @@ buildscript {
         turbine_test_version = '0.8.0'
         navigation_compose_version = '2.5.3'
         okhttp_version = '4.10.0'
+        datastore_version = '1.0.0'
     }
 }
 

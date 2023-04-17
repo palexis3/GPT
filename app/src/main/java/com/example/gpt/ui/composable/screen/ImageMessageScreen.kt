@@ -63,8 +63,7 @@ import com.example.gpt.ui.viewmodel.ImageViewModel
 
 @OptIn(
     ExperimentalComposeUiApi::class,
-    ExperimentalLifecycleComposeApi::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class
 )
 @Composable
 fun ImageMessageScreen(

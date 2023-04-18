@@ -126,7 +126,9 @@ fun ImageMessageScreen(
         ) {
             if (query.trim().isNotEmpty()) {
                 ExposedDropdownMenuBox(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .width(100.dp)
+                        .weight(1f),
                     expanded = dropdownExpanded,
                     onExpandedChange = { dropdownExpanded = !dropdownExpanded }
                 ) {

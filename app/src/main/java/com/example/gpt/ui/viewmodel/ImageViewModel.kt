@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gpt.data.model.image.create.ImageCreateRequest
 import com.example.gpt.data.model.image.ImageMessageUi
+import com.example.gpt.data.model.image.edit.ImageEditRequest
 import com.example.gpt.data.repository.image.ImageRepository
 import com.example.gpt.utils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,12 +28,17 @@ class ImageViewModel @Inject constructor(
     private val imageRepository: ImageRepository
 ) : ViewModel() {
 
-    private val _imageMessageUiState =
+    private val _imageCreateMessageUiState =
         MutableStateFlow<ImageMessageUiState>(ImageMessageUiState.Uninitialized)
-    val imageMessageUiState
-        get() = _imageMessageUiState.asStateFlow()
+    val imageCreateMessageUiState
+        get() = _imageCreateMessageUiState.asStateFlow()
 
-    fun getImages(prompt: String, numOf: Int = 1) {
+    private val _imageEditMessageUiState =
+        MutableStateFlow<ImageMessageUiState>(ImageMessageUiState.Uninitialized)
+    val imageEditMessageUiState
+        get() = _imageEditMessageUiState.asStateFlow()
+
+    fun getCreateImages(prompt: String, numOf: Int = 1) {
         val request = ImageCreateRequest(
             prompt = prompt, n = numOf
         )
@@ -52,14 +58,46 @@ class ImageViewModel @Inject constructor(
                         }
                     }
                     delay(100L)
-                    _imageMessageUiState.update { imageMessageUiState }
+                    _imageCreateMessageUiState.update { imageMessageUiState }
                 }
         }
     }
 
-    fun resetImageUiFlow() {
+    fun getEditImage(prompt: String, numOf: Int = 1, imageBase64String: String) {
+        val imageEditRequest = ImageEditRequest(
+            image = imageBase64String,
+            prompt = prompt,
+            n = numOf
+        )
+
         viewModelScope.launch {
-            _imageMessageUiState.update { ImageMessageUiState.Uninitialized }
+            imageRepository.editImage(imageEditRequest)
+                .asResult()
+                .collect { result ->
+                    val imageMessageUiState = when (result) {
+                        is Result.Loading -> ImageMessageUiState.Loading
+                        is Result.Error -> ImageMessageUiState.Error
+                        is Result.Success -> {
+                            val data = result.data
+                            val imageMessageUi = ImageMessageUi(images = data.images)
+                            ImageMessageUiState.Success(imageMessageUi)
+                        }
+                    }
+                    delay(100L)
+                    _imageEditMessageUiState.update { imageMessageUiState }
+                }
+        }
+    }
+
+    fun resetImageCreateUiFlow() {
+        viewModelScope.launch {
+            _imageCreateMessageUiState.update { ImageMessageUiState.Uninitialized }
+        }
+    }
+
+    fun resetImageEditUiFlow() {
+        viewModelScope.launch {
+            _imageEditMessageUiState.update { ImageMessageUiState.Uninitialized }
         }
     }
 }

@@ -22,7 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.gpt.ui.composable.screen.ChatMessageScreen
-import com.example.gpt.ui.composable.screen.ImageMessageScreen
+import com.example.gpt.ui.composable.screen.image.ImageMessageScreen
 import com.example.gpt.ui.composable.screen.SettingsScreen
 import com.example.gpt.ui.navigation.Screen
 import com.example.gpt.ui.theme.GptTheme

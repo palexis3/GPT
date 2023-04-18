@@ -6,6 +6,7 @@
     <string name="gpt">GPT</string>
     <string name="image_prompt">Type description for image</string>
     <string name="search_image">Search Image</string>
+    <string name="search">Search</string>
     <string name="num_of_image">Number of images</string>
     <string name="images_for">Image results for: %s</string>
     <string name="settings">Settings</string>
@@ -14,4 +15,8 @@
     <string name="confirm">Confirm</string>
     <string name="enter_api_key">Enter API Key</string>
     <string name="edit">Edit</string>
+    <string name="upload_image">Upload Image</string>
+    <string name="take_photo">Take a photo</string>
+    <string name="image_edit_prompt">Description of the desired image(s). The maximum length is 1000 characters</string>
+    <string name="image_selected"></string>
 </resources>

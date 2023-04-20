@@ -46,7 +46,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gpt.R
 import com.example.gpt.ui.composable.ShowErrorCard
@@ -58,7 +57,7 @@ import com.example.gpt.ui.viewmodel.ImageViewModel
 
 @OptIn(
     ExperimentalComposeUiApi::class,
-    ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class
+    ExperimentalMaterial3Api::class,
 )
 @Composable
 fun ImageMessageScreen(

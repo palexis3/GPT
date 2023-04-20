@@ -88,6 +88,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
 
     // Coil - Image Loading
+    implementation "io.coil-kt:coil:$coil_compose_version"
     implementation "io.coil-kt:coil-compose:$coil_compose_version"
 
     // Timber - Logging

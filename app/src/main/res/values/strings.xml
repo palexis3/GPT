@@ -18,5 +18,6 @@
     <string name="upload_image">Upload Image</string>
     <string name="take_photo">Take a photo</string>
     <string name="image_edit_prompt">Description of the desired image(s). The maximum length is 1000 characters</string>
-    <string name="image_selected"></string>
+    <string name="image_selected">Image selected : %s</string>
+    <string name="permission_denied">Permission has been denied!</string>
 </resources>

@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gpt.ui.composable.screen.ChatMessageScreen
 import com.example.gpt.ui.composable.screen.image.ImageMessageScreen
 import com.example.gpt.ui.composable.screen.SettingsScreen
+import com.example.gpt.ui.composable.screen.image.ImageEditScreen
 import com.example.gpt.ui.navigation.Screen
 import com.example.gpt.ui.theme.GptTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,7 +78,8 @@ fun ShowApp() {
                 Modifier.padding(innerPadding)
             ) {
                 composable(Screen.Chat.route) { ChatMessageScreen() }
-                composable(Screen.Image.route) { ImageMessageScreen() }
+//                composable(Screen.Image.route) { ImageMessageScreen() }
+                composable(Screen.Image.route) { ImageEditScreen() }
                 composable(Screen.Settings.route) { SettingsScreen() }
             }
         }

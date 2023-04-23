@@ -4,6 +4,7 @@ import com.example.gpt.data.model.image.create.ImageCreateRequest
 import com.example.gpt.data.model.image.ImageMessage
 import com.example.gpt.data.model.image.edit.ImageEditRequest
 import kotlinx.coroutines.flow.Flow
+import okhttp3.MultipartBody
 
 interface ImageRepository {
 

@@ -1,5 +1,6 @@
 package com.example.gpt.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gpt.data.model.image.create.ImageCreateRequest
@@ -10,11 +11,17 @@ import com.example.gpt.utils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.example.gpt.utils.Result
+import id.zelory.compressor.Compressor
+import java.io.File
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import timber.log.Timber
 
 sealed interface ImageMessageUiState {
     object Loading : ImageMessageUiState
@@ -63,11 +70,21 @@ class ImageViewModel @Inject constructor(
         }
     }
 
-    fun getEditImage(prompt: String, numOf: Int = 1, imageBase64String: String) {
+    fun getEditImage(prompt: String, numOf: Int = 1, file: File, imageFileString: String?) {
+//        val image = file?.asRequestBody("multipart/form-data".toMediaTypeOrNull())?.let {
+//            MultipartBody.Part.create(
+//                it
+//            )
+//        } ?: run {
+//            _imageEditMessageUiState.update { ImageMessageUiState.Error }
+//            return
+//        }
+
         val imageEditRequest = ImageEditRequest(
-            image = imageBase64String,
             prompt = prompt,
-            n = numOf
+            n = numOf,
+            imageFile = file,
+            imageFileAsString = imageFileString ?: ""
         )
 
         viewModelScope.launch {
@@ -83,6 +100,7 @@ class ImageViewModel @Inject constructor(
                             ImageMessageUiState.Success(imageMessageUi)
                         }
                     }
+                    Timber.tag("XXX-ImageVM").d("imageMessageUiState: %s", imageMessageUiState)
                     delay(100L)
                     _imageEditMessageUiState.update { imageMessageUiState }
                 }

@@ -1,18 +1,16 @@
 package com.example.gpt.utils
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
 import androidx.compose.foundation.lazy.LazyListState
-import java.io.ByteArrayOutputStream
+import timber.log.Timber
 
 
 fun LazyListState.isScrolledToEnd() =
     layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 2
 
-fun LazyListState.lastItemPosition() : Float =
+fun LazyListState.lastItemPosition(): Float =
     layoutInfo.visibleItemsInfo.lastOrNull()?.size?.toFloat() ?: 0F
 
 fun String.mask() =
@@ -24,16 +22,11 @@ fun String.mask() =
 
 
 fun Uri.toBase64String(context: Context): String {
-    val inputStream = context.contentResolver.openInputStream(this)
-    val outputStream = ByteArrayOutputStream()
-    val bitmapOptions = BitmapFactory.Options().apply {
-        inJustDecodeBounds = true
+    return try {
+        val bytes = context.contentResolver.openInputStream(this)?.readBytes()
+        Base64.encodeToString(bytes, Base64.DEFAULT)
+    } catch (ex: Exception) {
+        Timber.tag("XXX-toBase64String").d("exception: %s", ex.printStackTrace())
+        ""
     }
-
-    val bitmap = BitmapFactory.decodeStream(inputStream, null, bitmapOptions)
-    bitmap?.compress(Bitmap.CompressFormat.PNG, 0, outputStream)
-    val byteArray: ByteArray = outputStream.toByteArray()
-
-    inputStream?.close()
-    return Base64.encodeToString(byteArray, Base64.DEFAULT)
 }

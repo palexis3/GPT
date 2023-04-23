@@ -20,4 +20,5 @@
     <string name="image_edit_prompt">Description of the desired image(s). The maximum length is 1000 characters</string>
     <string name="image_selected">Image selected : %s</string>
     <string name="permission_denied">Permission has been denied!</string>
+    <string name="image_too_large">Sorry, image selected is too large. Try again</string>
 </resources>

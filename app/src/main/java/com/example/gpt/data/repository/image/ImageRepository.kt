@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 
 interface ImageRepository {
-
     fun getImages(imageCreateRequest: ImageCreateRequest): Flow<ImageMessage>
     fun editImage(imageEditRequest: ImageEditRequest): Flow<ImageMessage>
 }

@@ -36,11 +36,13 @@ class ImageRepositoryImpl @Inject constructor(
                     name = "image", filename = imageEditRequest.imageFile.name,
                     body = imageEditRequest.imageFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
                 )
+                .addFormDataPart(
+                    name = "mask", filename = imageEditRequest.imageFile.name,
+                    body = imageEditRequest.imageFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+                )
                 .build()
 
 //                .addFormDataPart("image", imageEditRequest.imageFileAsString)
-
-
 
             val response = api.editImage(formRequest)
             Timber.tag("XXX-ImageRepository").d("response: %s", response)

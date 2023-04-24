@@ -106,9 +106,10 @@ fun ImageEditScreen(
 
     val compressedFileFunc: () -> Unit = {
         coroutineScope.launch {
-            val maskedBitmap = currentImageFile?.toMaskedBitmap()
-            val tempFile = context.bitmapToFile(maskedBitmap)
-            compressedImageFile = tempFile?.let {
+//            val maskedBitmap = currentImageFile?.toMaskedBitmap()
+//            val tempFile = context.bitmapToFile(maskedBitmap)
+
+            compressedImageFile = currentImageFile?.let {
                 Compressor.compress(context, it) {
                     format(Bitmap.CompressFormat.PNG)
                     size(maxFileSize = MAX_FILE_SIZE)
@@ -240,7 +241,7 @@ fun ImageEditScreen(
                     keyboardController?.hide()
                     Log.d("XXX-ImageEditScreen", "fileTooLargeOrNull: ${compressedImageFile?.fileTooLargeOrNull()}")
 
-                    if (currentImageFile?.fileTooLargeOrNull() == true) {
+                    if (compressedImageFile?.fileTooLargeOrNull() == true) {
                         showImageErrorDialog = true
                         return@Button
                     }

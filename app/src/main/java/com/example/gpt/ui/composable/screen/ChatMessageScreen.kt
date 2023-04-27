@@ -64,6 +64,7 @@ import com.example.gpt.ui.composable.TypeWriter
 import com.example.gpt.ui.theme.MediumPadding
 import com.example.gpt.ui.viewmodel.ChatMessageUiState
 import com.example.gpt.ui.viewmodel.ChatViewModel
+import com.example.gpt.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
 
 
@@ -73,7 +74,8 @@ import kotlinx.coroutines.launch
 )
 @Composable
 fun ChatMessageScreen(
-    chatViewModel: ChatViewModel = hiltViewModel()
+    chatViewModel: ChatViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -84,6 +86,18 @@ fun ChatMessageScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val chatMessageUiState: ChatMessageUiState by chatViewModel.chatMessageUiState.collectAsStateWithLifecycle()
+    val initialChatMessagesUi by chatViewModel.initialChatMessagesUi.collectAsStateWithLifecycle()
+
+    // Note: On launch, we show the saved chat messages if the user wants to see them and
+    // whether there's messages to show
+    LaunchedEffect(initialChatMessagesUi) {
+        if (settingsViewModel.showAndSaveChatHistoryState.value
+            && initialChatMessagesUi.isNotEmpty()
+            && messageList.isEmpty()
+        ) {
+            messageList.addAll(initialChatMessagesUi)
+        }
+    }
 
     LaunchedEffect(chatMessageUiState) {
         processChatMessageUi(

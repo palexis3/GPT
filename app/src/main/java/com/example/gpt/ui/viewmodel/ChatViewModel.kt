@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.gpt.data.model.chat.ChatCompletionRequest
 import com.example.gpt.data.model.chat.ChatMessage
 import com.example.gpt.data.model.chat.ChatMessageUi
+import com.example.gpt.data.model.chat.ChatMessagesLocal
+import com.example.gpt.data.model.chat.toChatMessageUi
 import com.example.gpt.data.repository.chat.ChatRepository
 import com.example.gpt.utils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +15,12 @@ import com.example.gpt.utils.Result
 import com.example.gpt.utils.SettingPreferences
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -30,12 +37,18 @@ class ChatViewModel @Inject constructor(
     private val settingPreferences: SettingPreferences
 ) : ViewModel() {
 
-    init {
-        /**
-         *  TODO: Create init block that fetches all locally saved messages based on preferences value
-         *  and initialize the messageList property used in the ChatMessageScreen
-         */
-    }
+    // Note: Offline mode and Show history are the two functionalities being supported
+    val initialChatMessagesUi: StateFlow<List<ChatMessageUi>> =
+        chatRepository
+            .getAllSavedChatMessages()
+            .map { list ->
+                list.map { chatMessage -> chatMessage.toChatMessageUi() }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = emptyList()
+            )
 
     private val _chatMessageUiState =
         MutableStateFlow<ChatMessageUiState>(ChatMessageUiState.Uninitialized)
@@ -61,13 +74,15 @@ class ChatViewModel @Inject constructor(
                         is Result.Loading -> ChatMessageUiState.Loading
                         is Result.Error -> ChatMessageUiState.Error
                         is Result.Success -> {
-                            /**
-                             * TODO: Save successful response for particular prompt if setting
-                              preferences have been turned on.
-                              */
                             val data = result.data
                             val chatMessageUi =
                                 ChatMessageUi(role = data.role, content = data.content)
+
+                            // NOTE: Save successful response for this prompt typed in if setting
+                            // preferences have been turned on.
+                            if (settingPreferences.saveAndShowChatHistoryState().first()) {
+                                chatRepository.saveChatMessages(ChatMessagesLocal(prompt = message, content = data.content))
+                            }
                             ChatMessageUiState.Success(chatMessageUi)
                         }
                     }

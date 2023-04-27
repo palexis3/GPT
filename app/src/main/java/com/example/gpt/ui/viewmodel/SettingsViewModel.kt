@@ -20,11 +20,20 @@ class SettingsViewModel @Inject constructor(
     val apiKeyState
         get() = _apiKeyState.asStateFlow()
 
+    private var _showAndSaveChatHistoryState = MutableStateFlow(false)
+    val showAndSaveChatHistoryState
+        get() = _showAndSaveChatHistoryState.asStateFlow()
+
     init {
         viewModelScope.launch {
             settingPreferences.getApiKey()
                 .collectLatest { apiKey ->
                     _apiKeyState.update { apiKey ?: "" }
+                }
+
+            settingPreferences.saveAndShowChatHistoryState()
+                .collectLatest { bool ->
+                    _showAndSaveChatHistoryState.update { bool }
                 }
         }
     }
@@ -32,6 +41,12 @@ class SettingsViewModel @Inject constructor(
     fun setApiKey(apiKey: String) {
         viewModelScope.launch {
             settingPreferences.setApiKey(apiKey)
+        }
+    }
+
+    fun setSaveAndShowHistory(bool: Boolean) {
+        viewModelScope.launch {
+            settingPreferences.shouldSaveAndShowChatHistory(bool)
         }
     }
 }

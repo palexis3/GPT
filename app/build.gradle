@@ -103,6 +103,8 @@ dependencies {
 
     // Database - Room
     implementation "androidx.room:room-runtime:$room_version"
+    // Note: To use coroutine features from room, ktx is required
+    implementation "androidx.room:room-ktx:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 

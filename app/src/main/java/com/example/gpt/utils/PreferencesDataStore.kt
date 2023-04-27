@@ -16,8 +16,8 @@ interface SettingPreferences {
     suspend fun setApiKey(apiKey: String)
     suspend fun getApiKey(): Flow<String?>
 
-    suspend fun setSaveChatMessages(shouldStore: Boolean)
-    suspend fun getSaveChatMessages(): Flow<Boolean>
+    suspend fun shouldSaveAndShowChatHistory(bool: Boolean)
+    suspend fun saveAndShowChatHistoryState(): Flow<Boolean>
 }
 
 class MySettingPreferences @Inject constructor(
@@ -43,13 +43,13 @@ class MySettingPreferences @Inject constructor(
                 preferences[API_KEY]
             }
 
-    override suspend fun setSaveChatMessages(shouldStore: Boolean) {
+    override suspend fun shouldSaveAndShowChatHistory(bool: Boolean) {
         dataStore.edit { preferences ->
-            preferences[SAVE_CHAT_MESSAGES] = shouldStore
+            preferences[SAVE_AND_SHOW_CHAT_HISTORY] = bool
         }
     }
 
-    override suspend fun getSaveChatMessages(): Flow<Boolean> =
+    override suspend fun saveAndShowChatHistoryState(): Flow<Boolean> =
         dataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -58,7 +58,7 @@ class MySettingPreferences @Inject constructor(
                     throw exception
                 }
             }.map { preferences ->
-                preferences[SAVE_CHAT_MESSAGES] ?: false
+                preferences[SAVE_AND_SHOW_CHAT_HISTORY] ?: false
             }
 
     private companion object {
@@ -66,8 +66,8 @@ class MySettingPreferences @Inject constructor(
             name = "api_key"
         )
 
-        val SAVE_CHAT_MESSAGES = booleanPreferencesKey(
-            name = "save_chat_messages"
+        val SAVE_AND_SHOW_CHAT_HISTORY = booleanPreferencesKey(
+            name = "save_and_show_chat_history"
         )
     }
 }

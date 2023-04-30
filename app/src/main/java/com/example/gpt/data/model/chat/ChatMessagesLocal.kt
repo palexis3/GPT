@@ -16,9 +16,15 @@ data class ChatMessagesLocal(
     @ColumnInfo(name = "content") val content: String
 )
 
-fun ChatMessagesLocal.toChatMessages(): List<ChatMessage> {
-    val list = mutableListOf<ChatMessage>()
-    list.add(ChatMessage(role = "user", content = this.prompt))
-    list.add(ChatMessage(role = "assistant", content = this.content))
+/**
+ * Note: Since this was a saved response, there's no need to
+ * apply the typing animation again because the user has viewed it already.
+ */
+fun ChatMessagesLocal.toChatMessagesUi(): List<ChatMessageUi> {
+    val list = mutableListOf<ChatMessageUi>()
+    list.add(ChatMessageUi(role = "user", content = this.prompt))
+    list.add(ChatMessageUi(role = "assistant", content = this.content))
+    list.forEach { chatMessageUi -> chatMessageUi.apply { typeWriterSeenAlready = true } }
+
     return list
 }

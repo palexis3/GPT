@@ -1,25 +1,24 @@
 package com.example.gpt.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gpt.data.model.chat.ChatCompletionRequest
 import com.example.gpt.data.model.chat.ChatMessage
 import com.example.gpt.data.model.chat.ChatMessageUi
 import com.example.gpt.data.model.chat.ChatMessagesLocal
-import com.example.gpt.data.model.chat.toChatMessageUi
 import com.example.gpt.data.repository.chat.ChatRepository
+import com.example.gpt.utils.MySettingPreferences
 import com.example.gpt.utils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.example.gpt.utils.Result
-import com.example.gpt.utils.SettingPreferences
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,16 +33,13 @@ sealed interface ChatMessageUiState {
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
-    private val settingPreferences: SettingPreferences
+    private val settingPreferences: MySettingPreferences
 ) : ViewModel() {
 
     // Note: Offline mode and Show history are the two functionalities being supported
     val initialChatMessagesUi: StateFlow<List<ChatMessageUi>> =
         chatRepository
             .getAllSavedChatMessages()
-            .map { list ->
-                list.map { chatMessage -> chatMessage.toChatMessageUi() }
-            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Lazily,
@@ -80,7 +76,8 @@ class ChatViewModel @Inject constructor(
 
                             // NOTE: Save successful response for this prompt typed in if setting
                             // preferences have been turned on.
-                            if (settingPreferences.saveAndShowChatHistoryState().first()) {
+                            if (settingPreferences.saveAndShowChatHistoryState.first()) {
+                                Log.d("XXX-ChatViewModel", "settingPreferences.saveAndShowChatHistoryState called!")
                                 chatRepository.saveChatMessages(ChatMessagesLocal(prompt = message, content = data.content))
                             }
                             ChatMessageUiState.Success(chatMessageUi)

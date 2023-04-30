@@ -14,42 +14,26 @@ import kotlinx.coroutines.flow.map
 
 interface SettingPreferences {
     suspend fun setApiKey(apiKey: String)
-    suspend fun getApiKey(): Flow<String?>
-
     suspend fun shouldSaveAndShowChatHistory(bool: Boolean)
-    suspend fun saveAndShowChatHistoryState(): Flow<Boolean>
 }
 
 class MySettingPreferences @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) : SettingPreferences {
 
-    override suspend fun setApiKey(apiKey: String) {
-        dataStore.edit { preferences ->
-            preferences[API_KEY] = apiKey
-        }
-    }
-
-    override suspend fun getApiKey(): Flow<String?> =
-        dataStore.data
-            .catch { exception ->
-                if (exception is IOException) {
-                    emit(emptyPreferences())
-                } else {
-                    throw exception
-                }
+    val apiKey: Flow<String> =  dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
             }
-            .map { preferences ->
-                preferences[API_KEY]
-            }
-
-    override suspend fun shouldSaveAndShowChatHistory(bool: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[SAVE_AND_SHOW_CHAT_HISTORY] = bool
         }
-    }
+        .map { preferences ->
+            preferences[API_KEY] ?: ""
+        }
 
-    override suspend fun saveAndShowChatHistoryState(): Flow<Boolean> =
+    val saveAndShowChatHistoryState: Flow<Boolean> =
         dataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -60,6 +44,18 @@ class MySettingPreferences @Inject constructor(
             }.map { preferences ->
                 preferences[SAVE_AND_SHOW_CHAT_HISTORY] ?: false
             }
+
+    override suspend fun setApiKey(apiKey: String) {
+        dataStore.edit { preferences ->
+            preferences[API_KEY] = apiKey
+        }
+    }
+
+    override suspend fun shouldSaveAndShowChatHistory(bool: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[SAVE_AND_SHOW_CHAT_HISTORY] = bool
+        }
+    }
 
     private companion object {
         val API_KEY = stringPreferencesKey(

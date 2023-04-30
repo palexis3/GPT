@@ -1,6 +1,7 @@
 package com.example.gpt.data.remote
 
 import com.example.gpt.BuildConfig
+import com.example.gpt.utils.MySettingPreferences
 import com.example.gpt.utils.SettingPreferences
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -33,7 +34,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOpenAIApi(settingPreferences: SettingPreferences): OpenAIApi {
+    fun provideOpenAIApi(settingPreferences: MySettingPreferences): OpenAIApi {
         val moshi = Moshi.Builder()
             .addLast(KotlinJsonAdapterFactory())
             .build()
@@ -56,10 +57,10 @@ object NetworkModule {
     }
 }
 
-class AuthInterceptor(private val settingPreferences: SettingPreferences) : Interceptor {
+class AuthInterceptor(private val settingPreferences: MySettingPreferences) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val apiKey = runBlocking {
-            settingPreferences.getApiKey().firstOrNull() ?: ""
+            settingPreferences.apiKey.firstOrNull() ?: ""
         }
         val request = chain.request()
             .newBuilder()

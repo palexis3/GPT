@@ -1,5 +1,6 @@
 package com.example.gpt.ui.composable.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -50,8 +51,10 @@ fun SettingsScreen(
     val apiKey by settingsViewModel.apiKeyState.collectAsStateWithLifecycle()
     val showAndSaveChatHistory by settingsViewModel.showAndSaveChatHistoryState.collectAsStateWithLifecycle()
 
-    // TODO: Figure out why showAndSaveChatHistoryState is not emitting changed state
     var chatHistoryChecked by rememberSaveable { mutableStateOf(showAndSaveChatHistory) }
+
+    Log.d("XXX-SettingsScreen", "showAndSaveChatHistory $showAndSaveChatHistory")
+    Log.d("XXX-SettingsScreen", "chatHistoryChecked: $chatHistoryChecked")
 
     Column(
         modifier = Modifier
@@ -117,6 +120,7 @@ fun SettingsScreen(
             onCheckedChange = {
                 chatHistoryChecked = it
                 settingsViewModel.setSaveAndShowHistory(chatHistoryChecked)
+                Log.d("XXX-SettingsScreen", "onCheckedChange chatHistoryChecked: $chatHistoryChecked")
             }
         )
     }

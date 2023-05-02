@@ -21,7 +21,7 @@ class MySettingPreferences @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) : SettingPreferences {
 
-    val apiKey: Flow<String> =  dataStore.data
+    val apiKey: Flow<String> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())

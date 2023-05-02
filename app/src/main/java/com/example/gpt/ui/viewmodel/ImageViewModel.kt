@@ -9,7 +9,7 @@ import com.example.gpt.utils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.example.gpt.utils.Result
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -37,7 +37,7 @@ class ImageViewModel @Inject constructor(
             prompt = prompt, n = numOf
         )
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             imageRepository
                 .getImages(request)
                 .asResult()
@@ -51,7 +51,6 @@ class ImageViewModel @Inject constructor(
                             ImageMessageUiState.Success(imageMessageUi)
                         }
                     }
-                    delay(100L)
                     _imageMessageUiState.update { imageMessageUiState }
                 }
         }

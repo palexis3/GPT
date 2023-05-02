@@ -1,7 +1,7 @@
 package com.example.gpt.ui.composable.screen
 
-import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,13 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gpt.ui.viewmodel.SettingsViewModel
@@ -32,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -51,17 +56,17 @@ fun SettingsScreen(
     val apiKey by settingsViewModel.apiKeyState.collectAsStateWithLifecycle()
     val showAndSaveChatHistory by settingsViewModel.showAndSaveChatHistoryState.collectAsStateWithLifecycle()
 
-    var chatHistoryChecked by rememberSaveable { mutableStateOf(showAndSaveChatHistory) }
+    var chatHistoryChecked by rememberSaveable { mutableStateOf(false) }
 
-    Log.d("XXX-SettingsScreen", "showAndSaveChatHistory $showAndSaveChatHistory")
-    Log.d("XXX-SettingsScreen", "chatHistoryChecked: $chatHistoryChecked")
+    LaunchedEffect(showAndSaveChatHistory) {
+        chatHistoryChecked = showAndSaveChatHistory
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(MediumPadding)
     ) {
-
         Text(
             text = stringResource(id = R.string.settings),
             style = MaterialTheme.typography.headlineLarge,
@@ -71,58 +76,76 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
+        Card(
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Text(
-                text = stringResource(id = R.string.api_key),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 20.dp, start = 10.dp, end = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(id = R.string.api_key),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold
+                    )
 
-        Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-        when (apiKey) {
-            "" -> ShowEnterApiKey(newKeySelected = { apiKey ->
-                settingsViewModel.setApiKey(apiKey)
-            })
-            else -> {
-                ShowCurrentApiKey(
-                    apiKey = apiKey,
-                    newKeySelected = { apiKey ->
-                        settingsViewModel.setApiKey(apiKey)
+                    when (apiKey) {
+                        "" -> ShowEnterApiKey(newKeySelected = { apiKey ->
+                            settingsViewModel.setApiKey(apiKey)
+                        })
+                        else -> {
+                            ShowCurrentApiKey(
+                                apiKey = apiKey,
+                                newKeySelected = { apiKey ->
+                                    settingsViewModel.setApiKey(apiKey)
+                                }
+                            )
+                        }
                     }
+                }
+
+                Icon(
+                    painter = painterResource(id = R.drawable.navigate_forward_icon),
+                    contentDescription = "Navigate Forward"
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
+        Card(
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Text(
-                text = stringResource(id = R.string.show_and_save_history),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 20.dp, start = 10.dp, end = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(id = R.string.show_and_save_history),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold
+                )
 
-        Spacer(modifier = Modifier.height(2.dp))
-
-        Switch(
-            checked = chatHistoryChecked,
-            onCheckedChange = {
-                chatHistoryChecked = it
-                settingsViewModel.setSaveAndShowHistory(chatHistoryChecked)
-                Log.d("XXX-SettingsScreen", "onCheckedChange chatHistoryChecked: $chatHistoryChecked")
+                Switch(
+                    checked = chatHistoryChecked,
+                    onCheckedChange = { bool ->
+                        chatHistoryChecked = bool
+                        settingsViewModel.setSaveAndShowHistory(bool)
+                    }
+                )
             }
-        )
+        }
     }
 }
 
@@ -166,31 +189,14 @@ fun ShowEnterApiKey(newKeySelected: (String) -> Unit) {
 
 @Composable
 fun ApiKeyText(apiKey: String, shouldShowApiKeyText: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            modifier = Modifier.padding(start = 4.dp),
-            text = apiKey.mask(),
-            fontStyle = FontStyle.Italic,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.secondary
-        )
-
-        Spacer(modifier = Modifier.width(4.dp))
-
-        Button(
-            onClick = { shouldShowApiKeyText(false) }
-        ) {
-            Text(
-                text = stringResource(id = R.string.edit),
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-    }
+    Text(
+        text = apiKey.mask(),
+        modifier = Modifier.clickable { shouldShowApiKeyText(false) },
+        fontStyle = FontStyle.Italic,
+        fontWeight = FontWeight.ExtraBold,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.primary
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

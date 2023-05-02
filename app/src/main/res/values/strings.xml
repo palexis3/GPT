@@ -15,4 +15,6 @@
     <string name="enter_api_key">Enter API Key</string>
     <string name="edit">Edit</string>
     <string name="show_and_save_history">Show And Save Chat History</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.example.gpt.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gpt.data.model.chat.ChatCompletionRequest
@@ -13,7 +12,7 @@ import com.example.gpt.utils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.example.gpt.utils.Result
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +35,6 @@ class ChatViewModel @Inject constructor(
     private val settingPreferences: MySettingPreferences
 ) : ViewModel() {
 
-    // Note: Offline mode and Show history are the two functionalities being supported
     val initialChatMessagesUi: StateFlow<List<ChatMessageUi>> =
         chatRepository
             .getAllSavedChatMessages()
@@ -57,7 +55,7 @@ class ChatViewModel @Inject constructor(
             temperature = temperature
         )
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             /**
              * TODO: Combine getChatMessageFromApi and getSavedChatMessage to first see if a
              * response for the prompt was fetched and stored already else make another fetch to API
@@ -77,13 +75,16 @@ class ChatViewModel @Inject constructor(
                             // NOTE: Save successful response for this prompt typed in if setting
                             // preferences have been turned on.
                             if (settingPreferences.saveAndShowChatHistoryState.first()) {
-                                Log.d("XXX-ChatViewModel", "settingPreferences.saveAndShowChatHistoryState called!")
-                                chatRepository.saveChatMessages(ChatMessagesLocal(prompt = message, content = data.content))
+                                chatRepository.saveChatMessages(
+                                    ChatMessagesLocal(
+                                        prompt = message,
+                                        content = data.content
+                                    )
+                                )
                             }
                             ChatMessageUiState.Success(chatMessageUi)
                         }
                     }
-                    delay(100L)
                     _chatMessageUiState.update { chatMessageUiState }
                 }
         }

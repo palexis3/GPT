@@ -65,8 +65,8 @@ import com.example.gpt.ui.theme.MediumPadding
 import com.example.gpt.ui.viewmodel.ChatMessageUiState
 import com.example.gpt.ui.viewmodel.ChatViewModel
 import com.example.gpt.ui.viewmodel.SettingsViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-
 
 @OptIn(
     ExperimentalMaterial3Api::class,
@@ -90,8 +90,8 @@ fun ChatMessageScreen(
 
     // Note: On launch, we show the saved chat messages if the user wants to see them and
     // whether there's messages to show
-    LaunchedEffect(initialChatMessagesUi) {
-        if (settingsViewModel.showAndSaveChatHistoryState.value
+    LaunchedEffect(initialChatMessagesUi, settingsViewModel.showAndSaveChatHistoryState) {
+        if (settingsViewModel.showAndSaveChatHistoryState.first()
             && initialChatMessagesUi.isNotEmpty()
             && messageList.isEmpty()
         ) {

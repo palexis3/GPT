@@ -12,6 +12,8 @@ sealed interface Result<out T> {
     object Loading : Result<Nothing>
 }
 
+// NOTE: This flow extension method is to help handle the loading, error and success
+// states at the the view model layer when flows are being consumed.
 fun <T> Flow<T>.asResult(): Flow<Result<T>> {
     return this
         .map<T, Result<T>> {

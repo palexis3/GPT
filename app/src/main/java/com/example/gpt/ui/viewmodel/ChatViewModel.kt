@@ -37,7 +37,7 @@ class ChatViewModel @Inject constructor(
 
     val initialChatMessagesUi: StateFlow<List<ChatMessageUi>> =
         chatRepository
-            .getAllSavedChatMessages()
+            .getAllChatMessagesFromLocal()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Lazily,
@@ -56,21 +56,15 @@ class ChatViewModel @Inject constructor(
         )
 
         viewModelScope.launch(Dispatchers.IO) {
-            /**
-             * TODO: Combine getChatMessageFromApi and getSavedChatMessage to first see if a
-             * response for the prompt was fetched and stored already else make another fetch to API
-             */
             chatRepository
-                .getChatMessageFromApi(request)
+                .getChatMessage(request)
                 .asResult()
                 .collect { result ->
                     val chatMessageUiState = when (result) {
                         is Result.Loading -> ChatMessageUiState.Loading
                         is Result.Error -> ChatMessageUiState.Error
                         is Result.Success -> {
-                            val data = result.data
-                            val chatMessageUi =
-                                ChatMessageUi(role = data.role, content = data.content)
+                            val chatMessageUi = result.data
 
                             // NOTE: Save successful response for this prompt typed in if setting
                             // preferences have been turned on.
@@ -78,7 +72,7 @@ class ChatViewModel @Inject constructor(
                                 chatRepository.saveChatMessages(
                                     ChatMessagesLocal(
                                         prompt = message,
-                                        content = data.content
+                                        content = chatMessageUi.content
                                     )
                                 )
                             }

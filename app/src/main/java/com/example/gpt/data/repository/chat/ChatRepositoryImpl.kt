@@ -62,11 +62,11 @@ class ChatRepositoryImpl @Inject constructor(
                 // NOTE: Save successful response for this prompt typed in if setting
                 // preferences have been turned on.
                 if (shouldSaveMessage && remoteChatMessageUi != localChatMessageUi) {
-                    val messageToSave = ChatMessagesLocal(
+                    val newLocalMessages = ChatMessagesLocal(
                         prompt = prompt,
                         content = remoteChatMessageUi.content
                     )
-                    saveChatMessages(messageToSave)
+                    saveChatMessages(newLocalMessages)
                 }
             }
     }

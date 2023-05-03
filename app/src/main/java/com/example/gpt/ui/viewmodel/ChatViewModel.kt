@@ -5,9 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.gpt.data.model.chat.ChatCompletionRequest
 import com.example.gpt.data.model.chat.ChatMessage
 import com.example.gpt.data.model.chat.ChatMessageUi
-import com.example.gpt.data.model.chat.ChatMessagesLocal
 import com.example.gpt.data.repository.chat.ChatRepository
-import com.example.gpt.utils.MySettingPreferences
 import com.example.gpt.utils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -17,7 +15,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,8 +28,7 @@ sealed interface ChatMessageUiState {
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val chatRepository: ChatRepository,
-    private val settingPreferences: MySettingPreferences
+    private val chatRepository: ChatRepository
 ) : ViewModel() {
 
     val initialChatMessagesUi: StateFlow<List<ChatMessageUi>> =
@@ -64,18 +60,7 @@ class ChatViewModel @Inject constructor(
                         is Result.Loading -> ChatMessageUiState.Loading
                         is Result.Error -> ChatMessageUiState.Error
                         is Result.Success -> {
-                            val chatMessageUi = result.data
-
-                            // NOTE: Save successful response for this prompt typed in if setting
-                            // preferences have been turned on.
-                            if (settingPreferences.saveAndShowChatHistoryState.first()) {
-                                chatRepository.saveChatMessages(
-                                    ChatMessagesLocal(
-                                        prompt = message,
-                                        content = chatMessageUi.content
-                                    )
-                                )
-                            }
+                            val chatMessageUi: ChatMessageUi = result.data
                             ChatMessageUiState.Success(chatMessageUi)
                         }
                     }

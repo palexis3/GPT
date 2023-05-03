@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
     fun getAllChatMessagesFromLocal(): Flow<List<ChatMessageUi>>
+
     fun getChatMessageFromLocal(prompt: String): Flow<ChatMessageUi?>
+    fun getChatMessageFromApi(request: ChatCompletionRequest): Flow<ChatMessageUi>
     fun getChatMessage(request: ChatCompletionRequest): Flow<ChatMessageUi>
+
     suspend fun saveChatMessages(chatMessagesLocal: ChatMessagesLocal)
 }

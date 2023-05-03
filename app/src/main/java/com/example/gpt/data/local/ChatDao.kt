@@ -13,7 +13,7 @@ interface ChatDao {
     fun getAllLocalChatMessages(): Flow<List<ChatMessagesLocal>>
 
     @Query(value = "SELECT * FROM chatMessagesLocal WHERE prompt = :prompt")
-    fun getLocalChatMessage(prompt: String): ChatMessagesLocal
+    fun getLocalChatMessage(prompt: String): ChatMessagesLocal?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLocalChatMessage(message: ChatMessagesLocal)

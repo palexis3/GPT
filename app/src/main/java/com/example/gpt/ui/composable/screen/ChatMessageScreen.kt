@@ -1,6 +1,5 @@
 package com.example.gpt.ui.composable.screen
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +29,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,9 +41,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -85,12 +82,37 @@ fun ChatMessageScreen(
     val messageListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    val chatMessageUiState: ChatMessageUiState by chatViewModel.chatMessageUiState.collectAsStateWithLifecycle()
+    val chatMessageUiState by chatViewModel.chatMessageUiState.collectAsStateWithLifecycle()
     val initialChatMessagesUi by chatViewModel.initialChatMessagesUi.collectAsStateWithLifecycle()
+
+    val isLastMessageSeen by remember {
+        derivedStateOf {
+            val layoutInfo = messageListState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+
+            if (layoutInfo.totalItemsCount == 0) {
+                false
+            } else {
+                val lastVisibleItem = visibleItemsInfo.last()
+                val viewportHeight = layoutInfo.viewportEndOffset + layoutInfo.viewportStartOffset
+
+                lastVisibleItem.index + 1 == layoutInfo.totalItemsCount &&
+                        lastVisibleItem.offset + lastVisibleItem.size <= viewportHeight
+            }
+        }
+    }
+
+    // Note: When screen has finished composition, we ensure that the last message
+    // can be seen
+    LaunchedEffect(!isLastMessageSeen, messageList.size) {
+        coroutineScope.launch {
+            messageListState.animateScrollToItem(messageList.size, 1)
+        }
+    }
 
     // Note: On launch, we show the saved chat messages if the user wants to see them and
     // whether there's messages to show
-    LaunchedEffect(initialChatMessagesUi, settingsViewModel.showAndSaveChatHistoryState) {
+    LaunchedEffect(initialChatMessagesUi) {
         if (settingsViewModel.showAndSaveChatHistoryState.first()
             && initialChatMessagesUi.isNotEmpty()
             && messageList.isEmpty()
@@ -99,6 +121,7 @@ fun ChatMessageScreen(
         }
     }
 
+    // Note: Handles chat messages being entered in realtime
     LaunchedEffect(chatMessageUiState) {
         processChatMessageUi(
             chatMessageUiState,
@@ -114,16 +137,6 @@ fun ChatMessageScreen(
         )
     }
 
-    var scrollToPosition by remember { mutableStateOf(0F) }
-
-    LaunchedEffect(messageList.size) {
-        if (messageList.size > 0) {
-            coroutineScope.launch {
-                messageListState.animateScrollToItem(messageList.size - 1)
-            }
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -132,8 +145,7 @@ fun ChatMessageScreen(
     ) {
         LazyColumn(
             modifier = Modifier
-                .weight(1f)
-                .animateContentSize(),
+                .weight(1f),
             state = messageListState
         ) {
             items(
@@ -141,9 +153,7 @@ fun ChatMessageScreen(
             ) { message ->
                 when (message) {
                     is ChatMessageUi -> ShowMessage(
-                        chatMessageUi = message,
-                        currentYPosition = { position -> },
-                        dynamicMessageHeight = { heightChange -> }
+                        chatMessageUi = message
                     )
                     is LoadingMessageUi -> ShowLoading()
                 }
@@ -229,9 +239,7 @@ private fun processChatMessageUi(
 
 @Composable
 fun ShowMessage(
-    chatMessageUi: ChatMessageUi,
-    currentYPosition: (Float) -> Unit,
-    dynamicMessageHeight: (Int) -> Unit
+    chatMessageUi: ChatMessageUi
 ) {
     val isUser = chatMessageUi.role == "user"
     val isChatAssistant = chatMessageUi.role == "assistant"
@@ -253,13 +261,7 @@ fun ShowMessage(
         Card(
             modifier = Modifier
                 .widthIn(200.dp, 275.dp)
-                .padding(4.dp)
-                .onGloballyPositioned { layoutCoordinates ->
-                    currentYPosition(layoutCoordinates.positionInParent().y)
-                }
-                .onSizeChanged { size ->
-                    dynamicMessageHeight(size.height)
-                },
+                .padding(4.dp),
             colors = CardDefaults.cardColors(
                 containerColor = cardBackgroundColor
             ),

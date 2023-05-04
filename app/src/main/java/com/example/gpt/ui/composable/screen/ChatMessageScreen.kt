@@ -1,8 +1,8 @@
 package com.example.gpt.ui.composable.screen
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,10 +44,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -85,8 +86,25 @@ fun ChatMessageScreen(
     val messageListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    val chatMessageUiState: ChatMessageUiState by chatViewModel.chatMessageUiState.collectAsStateWithLifecycle()
+    val chatMessageUiState by chatViewModel.chatMessageUiState.collectAsStateWithLifecycle()
     val initialChatMessagesUi by chatViewModel.initialChatMessagesUi.collectAsStateWithLifecycle()
+
+    val isLastMessageSeen by remember {
+        derivedStateOf {
+            val layoutInfo = messageListState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+
+            if (layoutInfo.totalItemsCount == 0) {
+                false
+            } else {
+                val lastVisibleItem = visibleItemsInfo.last()
+                val viewportHeight = layoutInfo.viewportEndOffset + layoutInfo.viewportStartOffset
+
+                lastVisibleItem.index + 1 == layoutInfo.totalItemsCount &&
+                        lastVisibleItem.offset + lastVisibleItem.size <= viewportHeight
+            }
+        }
+    }
 
     // Note: On launch, we show the saved chat messages if the user wants to see them and
     // whether there's messages to show
@@ -114,13 +132,9 @@ fun ChatMessageScreen(
         )
     }
 
-    var scrollToPosition by remember { mutableStateOf(0F) }
-
-    LaunchedEffect(messageList.size) {
-        if (messageList.size > 0) {
-            coroutineScope.launch {
-                messageListState.animateScrollToItem(messageList.size - 1)
-            }
+    LaunchedEffect(!isLastMessageSeen) {
+        coroutineScope.launch {
+            messageListState.animateScrollToItem(messageList.size, 1)
         }
     }
 
@@ -132,8 +146,7 @@ fun ChatMessageScreen(
     ) {
         LazyColumn(
             modifier = Modifier
-                .weight(1f)
-                .animateContentSize(),
+                .weight(1f),
             state = messageListState
         ) {
             items(
@@ -141,9 +154,7 @@ fun ChatMessageScreen(
             ) { message ->
                 when (message) {
                     is ChatMessageUi -> ShowMessage(
-                        chatMessageUi = message,
-                        currentYPosition = { position -> },
-                        dynamicMessageHeight = { heightChange -> }
+                        chatMessageUi = message
                     )
                     is LoadingMessageUi -> ShowLoading()
                 }
@@ -229,9 +240,7 @@ private fun processChatMessageUi(
 
 @Composable
 fun ShowMessage(
-    chatMessageUi: ChatMessageUi,
-    currentYPosition: (Float) -> Unit,
-    dynamicMessageHeight: (Int) -> Unit
+    chatMessageUi: ChatMessageUi
 ) {
     val isUser = chatMessageUi.role == "user"
     val isChatAssistant = chatMessageUi.role == "assistant"
@@ -253,13 +262,7 @@ fun ShowMessage(
         Card(
             modifier = Modifier
                 .widthIn(200.dp, 275.dp)
-                .padding(4.dp)
-                .onGloballyPositioned { layoutCoordinates ->
-                    currentYPosition(layoutCoordinates.positionInParent().y)
-                }
-                .onSizeChanged { size ->
-                    dynamicMessageHeight(size.height)
-                },
+                .padding(4.dp),
             colors = CardDefaults.cardColors(
                 containerColor = cardBackgroundColor
             ),

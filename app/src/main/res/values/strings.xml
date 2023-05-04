@@ -21,4 +21,7 @@
     <string name="image_selected">Image selected : %s</string>
     <string name="permission_denied">Permission has been denied!</string>
     <string name="image_too_large">Sorry, image selected is too large. Try again</string>
+    <string name="show_and_save_history">Show And Save Chat History</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
 </resources>

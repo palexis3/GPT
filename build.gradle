@@ -18,6 +18,7 @@ buildscript {
         navigation_compose_version = '2.5.3'
         okhttp_version = '4.10.0'
         datastore_version = '1.0.0'
+        room_version = '2.5.1'
     }
 }
 

@@ -105,6 +105,13 @@ dependencies {
     // Image Compression library
     implementation 'id.zelory:compressor:3.0.1'
 
+    // Database - Room
+    implementation "androidx.room:room-runtime:$room_version"
+    // Note: To use coroutine features from room, ktx is required
+    implementation "androidx.room:room-ktx:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"

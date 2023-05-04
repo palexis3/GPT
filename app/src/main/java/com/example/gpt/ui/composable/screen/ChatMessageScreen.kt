@@ -102,9 +102,17 @@ fun ChatMessageScreen(
         }
     }
 
+    // Note: When screen has finished composition, we ensure that the last message
+    // can be seen
+    LaunchedEffect(!isLastMessageSeen, messageList.size) {
+        coroutineScope.launch {
+            messageListState.animateScrollToItem(messageList.size, 1)
+        }
+    }
+
     // Note: On launch, we show the saved chat messages if the user wants to see them and
     // whether there's messages to show
-    LaunchedEffect(initialChatMessagesUi, settingsViewModel.showAndSaveChatHistoryState) {
+    LaunchedEffect(initialChatMessagesUi) {
         if (settingsViewModel.showAndSaveChatHistoryState.first()
             && initialChatMessagesUi.isNotEmpty()
             && messageList.isEmpty()
@@ -113,6 +121,7 @@ fun ChatMessageScreen(
         }
     }
 
+    // Note: Handles chat messages being entered in realtime
     LaunchedEffect(chatMessageUiState) {
         processChatMessageUi(
             chatMessageUiState,
@@ -126,12 +135,6 @@ fun ChatMessageScreen(
                 messageList.add(LoadingMessageUi)
             }
         )
-    }
-
-    LaunchedEffect(!isLastMessageSeen) {
-        coroutineScope.launch {
-            messageListState.animateScrollToItem(messageList.size, 1)
-        }
     }
 
     Column(

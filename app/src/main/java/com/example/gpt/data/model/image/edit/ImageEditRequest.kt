@@ -6,5 +6,6 @@ data class ImageEditRequest(
     val prompt: String,
     val n: Int,
     val imageFile: File,
+    val maskFile: File,
     val imageFileAsString: String
 )

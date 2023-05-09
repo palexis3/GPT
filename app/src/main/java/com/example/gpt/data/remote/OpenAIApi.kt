@@ -15,22 +15,20 @@ import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.PartMap
 
 interface OpenAIApi {
 
-    @Headers("Accept: application/json")
     @POST("/v1/chat/completions")
     suspend fun createChatCompletion(
         @Body chatCompletionRequest: ChatCompletionRequest
     ): ChatCompletionResponse
 
-    @Headers("Accept: application/json")
     @POST("/v1/images/generations")
     suspend fun createImage(
         @Body imageCreateRequest: ImageCreateRequest
     ): ImageCreateResponse
 
-    @Headers("Accept: application/json")
     @POST("/v1/audio/transcriptions")
     suspend fun createTranscription(
         @Body audioCreateRequest: AudioCreateRequest
@@ -39,5 +37,21 @@ interface OpenAIApi {
     @POST("/v1/images/edits")
     suspend fun editImage(
         @Body body: RequestBody
+    ): ImageEditResponse
+
+    @Multipart
+    @POST("/v1/images/edits")
+    suspend fun editImage(
+        @PartMap partMap: MutableMap<String, RequestBody>,
+        @Part image: MultipartBody.Part
+    ): ImageEditResponse
+
+    @Multipart
+    @POST("/v1/images/edits")
+    suspend fun editImage(
+        @Part("prompt") prompt: RequestBody,
+        @Part("n") n: RequestBody,
+        @Part("response_format") responseFormat: RequestBody,
+        @Part image: MultipartBody.Part
     ): ImageEditResponse
 }

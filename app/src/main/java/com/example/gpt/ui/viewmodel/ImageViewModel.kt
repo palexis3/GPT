@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 sealed interface ImageMessageUiState {
     object Loading : ImageMessageUiState
@@ -54,8 +53,7 @@ class ImageViewModel @Inject constructor(
                         is Result.Loading -> ImageMessageUiState.Loading
                         is Result.Error -> ImageMessageUiState.Error
                         is Result.Success -> {
-                            val data = result.data
-                            val imageMessageUi = ImageMessageUi(images = data.images)
+                            val imageMessageUi = result.data
                             ImageMessageUiState.Success(imageMessageUi)
                         }
                     }
@@ -64,20 +62,18 @@ class ImageViewModel @Inject constructor(
         }
     }
 
-    fun getEditImage(prompt: String, numOf: Int = 1, file: File, imageFileString: String?) {
-//        val image = file?.asRequestBody("multipart/form-data".toMediaTypeOrNull())?.let {
-//            MultipartBody.Part.create(
-//                it
-//            )
-//        } ?: run {
-//            _imageEditMessageUiState.update { ImageMessageUiState.Error }
-//            return
-//        }
-
+    fun getEditImage(
+        prompt: String,
+        numOf: Int = 1,
+        file: File,
+        mask: File,
+        imageFileString: String?
+    ) {
         val imageEditRequest = ImageEditRequest(
             prompt = prompt,
             n = numOf,
             imageFile = file,
+            maskFile = mask,
             imageFileAsString = imageFileString ?: ""
         )
 
@@ -89,12 +85,10 @@ class ImageViewModel @Inject constructor(
                         is Result.Loading -> ImageMessageUiState.Loading
                         is Result.Error -> ImageMessageUiState.Error
                         is Result.Success -> {
-                            val data = result.data
-                            val imageMessageUi = ImageMessageUi(images = data.images)
+                            val imageMessageUi = result.data
                             ImageMessageUiState.Success(imageMessageUi)
                         }
                     }
-                    Timber.tag("XXX-ImageVM").d("imageMessageUiState: %s", imageMessageUiState)
                     _imageEditMessageUiState.update { imageMessageUiState }
                 }
         }
@@ -103,12 +97,6 @@ class ImageViewModel @Inject constructor(
     fun resetImageCreateUiFlow() {
         viewModelScope.launch {
             _imageCreateMessageUiState.update { ImageMessageUiState.Uninitialized }
-        }
-    }
-
-    fun resetImageEditUiFlow() {
-        viewModelScope.launch {
-            _imageEditMessageUiState.update { ImageMessageUiState.Uninitialized }
         }
     }
 }

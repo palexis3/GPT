@@ -64,6 +64,7 @@ import com.example.gpt.utils.convertUriToFile
 import com.example.gpt.utils.createImageFile
 import com.example.gpt.utils.fileTooLargeOrNull
 import com.example.gpt.utils.getFileUri
+import com.example.gpt.utils.processUriToFile
 import com.example.gpt.utils.toBase64String
 import com.example.gpt.utils.toMaskedBitmap
 import id.zelory.compressor.Compressor
@@ -84,8 +85,8 @@ fun ImageEditScreen(
     imageViewModel: ImageViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     var prompt by remember { mutableStateOf("") }
     val numOf by remember { mutableStateOf(1) }
@@ -119,13 +120,22 @@ fun ImageEditScreen(
         }
     }
 
+    val fileFunc: () -> Unit = {
+        coroutineScope.launch {
+            currentImageFile = processUriToFile(currentImageUri, context)
+            val maskedBitmap = currentImageFile.toMaskedBitmap()
+            compressedImageFile = bitmapToFile(currentImageFile, maskedBitmap)
+        }
+    }
+
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
             currentImageUri = tempImageUri
-            currentImageFile = context.convertUriToFile(currentImageUri)
-            compressedFileFunc.invoke()
+            fileFunc.invoke()
+//            currentImageFile = context.convertUriToFile(currentImageUri)
+//            compressedFileFunc.invoke()
         }
     }
 
@@ -133,8 +143,9 @@ fun ImageEditScreen(
         contract = ActivityResultContracts.GetContent(),
         onResult = { imagePickedUri ->
             currentImageUri = imagePickedUri
-            currentImageFile = context.convertUriToFile(currentImageUri)
-            compressedFileFunc.invoke()
+//            currentImageFile = context.convertUriToFile(currentImageUri)
+//            compressedFileFunc.invoke()
+            fileFunc.invoke()
         }
     )
 
@@ -236,25 +247,31 @@ fun ImageEditScreen(
         ) {
             // TODO: Add numOf selection
             Button(
-                enabled = prompt.isNotEmpty() && compressedImageFile != null,
+                enabled = prompt.isNotEmpty() && currentImageFile != null,
                 onClick = {
                     keyboardController?.hide()
-                    Log.d("XXX-ImageEditScreen", "fileTooLargeOrNull: ${compressedImageFile?.fileTooLargeOrNull()}")
+                    Log.d(
+                        "XXX-ImageEditScreen",
+                        "fileTooLargeOrNull: ${currentImageFile?.fileTooLargeOrNull()}"
+                    )
 
-                    if (compressedImageFile?.fileTooLargeOrNull() == true) {
+                    if (currentImageFile?.fileTooLargeOrNull() == true) {
                         showImageErrorDialog = true
                         return@Button
                     }
                     Log.d("XXX-ImageEditScreen", "showImageErrorDialog: $showImageErrorDialog")
 
-                    compressedImageFile?.let {
-                        imageViewModel.getEditImage(
-                            prompt = prompt,
-                            numOf = numOf,
-                            file = it,
-                            imageFileString = currentImageUri?.toBase64String(context)
-                        )
-                    }
+                    val compressedMaskFile = compressedImageFile ?: return@Button
+                    val imageFile = currentImageFile ?: return@Button
+
+                    imageViewModel.getEditImage(
+                        prompt = prompt,
+                        numOf = numOf,
+                        file = imageFile,
+                        mask = compressedMaskFile,
+                        imageFileString = currentImageUri?.toBase64String(context)
+                    )
+
                     currentImageUri = Uri.EMPTY
                     currentImageFile = null
                     compressedImageFile = null
@@ -298,6 +315,7 @@ fun ShowImageErrorDialog(
 
 @Composable
 fun ShowImageMessageUiState(imageMessageUiState: ImageMessageUiState) {
+    // TODO - Add prompt and image that user entered in along with API response in chat fashion
     LazyColumn(
         verticalArrangement = Arrangement.SpaceEvenly,
         contentPadding = PaddingValues(

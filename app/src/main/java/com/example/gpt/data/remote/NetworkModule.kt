@@ -64,7 +64,7 @@ class AuthInterceptor(private val settingPreferences: MySettingPreferences) : In
         val request = chain.request()
             .newBuilder()
             .header("Authorization", "Bearer $apiKey")
-//            .header("Content-Type", "application/json")
+            .header("Content-Type", "application/json")
             .build()
 
         return chain.proceed(request)

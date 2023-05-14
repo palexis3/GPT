@@ -1,6 +1,7 @@
 package com.example.gpt.data.remote
 
 import com.example.gpt.BuildConfig
+import com.example.gpt.utils.MySettingPreferences
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -9,6 +10,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -22,21 +25,21 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 
-
 private const val BASE_URL = "https://api.openai.com/"
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
     @Provides
     @Singleton
-    fun provideOpenAIApi(): OpenAIApi {
+    fun provideOpenAIApi(settingPreferences: MySettingPreferences): OpenAIApi {
         val moshi = Moshi.Builder()
             .addLast(KotlinJsonAdapterFactory())
             .build()
 
         val client: OkHttpClient = OkHttpClient.Builder().apply {
-            addInterceptor(AuthInterceptor())
+            addInterceptor(AuthInterceptor(settingPreferences))
             if (BuildConfig.DEBUG) {
                 addInterceptor(LoggingInterceptor())
             }
@@ -53,11 +56,14 @@ object NetworkModule {
     }
 }
 
-class AuthInterceptor : Interceptor {
+class AuthInterceptor(private val settingPreferences: MySettingPreferences) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
+        val apiKey = runBlocking {
+            settingPreferences.apiKey.firstOrNull() ?: ""
+        }
         val request = chain.request()
             .newBuilder()
-            .header("Authorization", "Bearer ${BuildConfig.OPEN_AI_KEY}")
+            .header("Authorization", "Bearer $apiKey")
             .header("Content-Type", "application/json")
             .build()
 

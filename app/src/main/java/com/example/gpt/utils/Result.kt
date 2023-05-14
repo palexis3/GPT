@@ -1,5 +1,6 @@
 package com.example.gpt.utils
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -11,11 +12,16 @@ sealed interface Result<out T> {
     object Loading : Result<Nothing>
 }
 
+// NOTE: This flow extension method is to help handle the loading, error and success
+// states at the the view model layer when flows are being consumed.
 fun <T> Flow<T>.asResult(): Flow<Result<T>> {
     return this
         .map<T, Result<T>> {
             Result.Success(it)
         }
-        .onStart { emit(Result.Loading) }
+        .onStart {
+            delay(100L)
+            emit(Result.Loading)
+        }
         .catch { emit(Result.Error(it)) }
 }

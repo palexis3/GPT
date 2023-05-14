@@ -10,4 +10,14 @@
     <string name="images_for">Image results for: %s</string>
 
     <string name="audio_permission_denied">Audio permission has been denied.</string>
+
+    <string name="settings">Settings</string>
+    <string name="api_key">API Key</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="confirm">Confirm</string>
+    <string name="enter_api_key">Enter API Key</string>
+    <string name="edit">Edit</string>
+    <string name="show_and_save_history">Show And Save Chat History</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
 </resources>

@@ -67,14 +67,16 @@ class ImageViewModel @Inject constructor(
         numOf: Int = 1,
         file: File,
         mask: File,
-        imageFileString: String?
+        imageFileString: String?,
+        maskFileString: String?
     ) {
         val imageEditRequest = ImageEditRequest(
             prompt = prompt,
             n = numOf,
             imageFile = file,
             maskFile = mask,
-            imageFileAsString = imageFileString ?: ""
+            imageFileAsString = imageFileString ?: "",
+            maskFileAsString = maskFileString ?: ""
         )
 
         viewModelScope.launch {

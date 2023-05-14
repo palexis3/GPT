@@ -10,6 +10,8 @@ import android.hardware.HardwareBuffer.RGBA_8888
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Base64
+import android.util.Base64OutputStream
 import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.core.content.FileProvider.getUriForFile
@@ -249,4 +251,25 @@ fun File?.fileTooLargeOrNull(): Boolean {
         Log.d("XXX-FileExtension", "imageSize: ${it.length()} sizeCalculated: $size")
         size > 4
     } ?: true
+}
+
+fun Uri.toBase64String(context: Context): String {
+    return try {
+        val bytes = context.contentResolver.openInputStream(this)?.readBytes()
+        Base64.encodeToString(bytes, Base64.DEFAULT)
+    } catch (ex: Exception) {
+        Timber.tag("XXX-toBase64String").d("exception: %s", ex.printStackTrace())
+        ""
+    }
+}
+
+fun File?.toBase64String(): String {
+    return ByteArrayOutputStream().use { outputStream ->
+        Base64OutputStream(outputStream, Base64.DEFAULT).use { base64FilterStream ->
+            this?.inputStream().use { inputStream ->
+                inputStream?.copyTo(base64FilterStream) ?: ""
+            }
+        }
+        return@use outputStream.toString()
+    }
 }

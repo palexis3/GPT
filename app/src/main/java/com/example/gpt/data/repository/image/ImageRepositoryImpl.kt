@@ -50,24 +50,25 @@ class ImageRepositoryImpl @Inject constructor(
 //            val response = api.editImage(formRequest)
 
             // Attempt: 2
-            val prompt = imageEditRequest.prompt.toRequestBody("text/plain".toMediaTypeOrNull())
-            val n = imageEditRequest.n.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-            val responseFormat = "url".toRequestBody("text/plain".toMediaTypeOrNull())
-//            val image = MultipartBody.Part.createFormData(
-//                name = "image", filename = imageEditRequest.imageFile.name,
-//                body = imageEditRequest.imageFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+//            val prompt = imageEditRequest.prompt.toRequestBody("text/plain".toMediaTypeOrNull())
+//            val n = imageEditRequest.n.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+//            val responseFormat = "url".toRequestBody("text/plain".toMediaTypeOrNull())
+//            val mask = MultipartBody.Part.createFormData(
+//                name = "mask", filename = imageEditRequest.maskFile.name,
+//                body = imageEditRequest.maskFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
 //            )
-            val image = MultipartBody.Part.createFormData(
-                name = "image", filename = imageEditRequest.maskFile.name,
-                body = imageEditRequest.maskFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-            )
+//            val image = MultipartBody.Part.createFormData(
+//                name = "image", filename = imageEditRequest.maskFile.name,
+//                body = imageEditRequest.maskFile.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+//            )
+//
+//            val response = api.editImage(
+//                prompt = prompt,
+//                n = n,
+//                responseFormat = responseFormat,
+//                image = image
+//            )
 
-            val response = api.editImage(
-                prompt = prompt,
-                n = n,
-                responseFormat = responseFormat,
-                image = image
-            )
 
             // Attempt: 3
 //            val map: MutableMap<String, RequestBody> = mutableMapOf()
@@ -86,6 +87,16 @@ class ImageRepositoryImpl @Inject constructor(
 //            )
 
             // Attempt: 4 - Try converting image and mask to b64_json and using that
+            val formRequest: RequestBody = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("prompt", imageEditRequest.prompt)
+                .addFormDataPart("n", imageEditRequest.n.toString())
+                .addFormDataPart("image", imageEditRequest.imageFileAsString)
+                .build()
+
+            val response = api.editImage(formRequest)
+
+            Timber.tag("XXX-ImageRepository").d("image: %s", imageEditRequest.imageFileAsString)
 
             Timber.tag("XXX-ImageRepository").d("response: %s", response)
             val messageUi = processImageResponse(response.data)

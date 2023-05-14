@@ -250,16 +250,11 @@ fun ImageEditScreen(
                 enabled = prompt.isNotEmpty() && currentImageFile != null,
                 onClick = {
                     keyboardController?.hide()
-                    Log.d(
-                        "XXX-ImageEditScreen",
-                        "fileTooLargeOrNull: ${currentImageFile?.fileTooLargeOrNull()}"
-                    )
 
                     if (currentImageFile?.fileTooLargeOrNull() == true) {
                         showImageErrorDialog = true
                         return@Button
                     }
-                    Log.d("XXX-ImageEditScreen", "showImageErrorDialog: $showImageErrorDialog")
 
                     val compressedMaskFile = compressedImageFile ?: return@Button
                     val imageFile = currentImageFile ?: return@Button
@@ -269,7 +264,8 @@ fun ImageEditScreen(
                         numOf = numOf,
                         file = imageFile,
                         mask = compressedMaskFile,
-                        imageFileString = currentImageUri?.toBase64String(context)
+                        imageFileString = imageFile.toBase64String(),
+                        maskFileString = compressedImageFile.toBase64String()
                     )
 
                     currentImageUri = Uri.EMPTY

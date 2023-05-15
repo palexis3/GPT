@@ -6,13 +6,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-fun Context.createImageFile(): File {
+fun Context.createAudioFilePath(): String {
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    val imageFileName = "mp3" + timeStamp + "_"
+    val prefixAudioFileName = timeStamp + "_"
 
-    return File.createTempFile(
-        imageFileName,
-        ".mp3",
-        externalCacheDir
-    )
+   val audioFile = File.createTempFile(
+       prefixAudioFileName,
+        ".mp4",
+        cacheDir
+    ).apply { createNewFile() }
+
+    return audioFile.path
 }

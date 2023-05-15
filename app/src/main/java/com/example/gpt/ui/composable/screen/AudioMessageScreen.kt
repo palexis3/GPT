@@ -3,10 +3,7 @@ package com.example.gpt.ui.composable.screen
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.media.MediaPlayer
-import android.media.MediaRecorder
-import android.os.Build
-import android.util.Log
+import com.example.gpt.manager.AudioManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,9 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.gpt.R
 import com.example.gpt.ui.viewmodel.AudioViewModel
-import com.example.gpt.utils.createImageFile
-import java.io.IOException
-import timber.log.Timber
+import com.example.gpt.utils.createAudioFilePath
 
 @Composable
 fun AudioMessageScreen(
@@ -40,13 +35,8 @@ fun AudioMessageScreen(
 ) {
     val context = LocalContext.current
 
-    val file by remember { mutableStateOf(context.createImageFile()) }
-    val dataSource = "android.resource://com.example.gpt/raw/${file.name}"
-
-    Log.d("XXX-AudioMessageScreen", "file: $file filePath: ${file.path} fileName: ${file.name}")
-
-    var player: MediaPlayer? = null
-    var recorder: MediaRecorder? = null
+    val audioFilePath by remember { mutableStateOf(context.createAudioFilePath()) }
+    val audioManager by remember { mutableStateOf(AudioManager(context, audioFilePath)) }
 
     var startPlaying by remember { mutableStateOf(false) }
     var startRecording by remember { mutableStateOf(false) }
@@ -60,15 +50,7 @@ fun AudioMessageScreen(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { success ->
             if (success) {
-                startRecording(
-                    recorderOnCalled = { mediaRecorder ->
-                        if (recorder == null) {
-                            recorder = mediaRecorder
-                        }
-                    },
-                    file.path,
-                    context
-                )
+                audioManager.startRecording()
             } else {
                 Toast.makeText(context, R.string.audio_permission_denied, Toast.LENGTH_SHORT).show()
             }
@@ -85,16 +67,12 @@ fun AudioMessageScreen(
                 startPlaying = shouldPlay
 
                 if (shouldPlay) {
-                    startPlaying(
-                        playerOnCalled = { mediaPlayer ->
-                            if (player == null) {
-                                player = mediaPlayer
-                            }
-                        },
-                        file.path
-                    )
+                    val wasPlaybackSuccessful = audioManager.startPlayback()
+                    if (!wasPlaybackSuccessful) {
+                        Toast.makeText(context, "There was an error with playback", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    stopPlaying(player)
+                    audioManager.stopPlayback()
                 }
             })
 
@@ -106,72 +84,15 @@ fun AudioMessageScreen(
 
                 if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
                     if (shouldRecord) {
-                        startRecording(
-                            recorderOnCalled = { mediaRecorder ->
-                                if (recorder == null) {
-                                    recorder = mediaRecorder
-                                }
-                            },
-                            file.path,
-                            context
-                        )
+                        audioManager.startRecording()
                     } else {
-                        stopRecording(recorder)
+                        audioManager.stopRecording()
                     }
                 } else {
                     permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                 }
             })
     }
-}
-
-private fun startPlaying(playerOnCalled: (MediaPlayer) -> Unit, dataSource: String) {
-    playerOnCalled(
-        MediaPlayer().apply {
-            try {
-                setDataSource(dataSource)
-                // TODO: Add more of MediaPlayer's listeners to capture errors
-                setOnPreparedListener { mediaPlayer ->
-                    mediaPlayer.start()
-                }
-                prepareAsync()
-            } catch (e: IOException) {
-                Timber.d("startPlaying failed exception: $e")
-            }
-        }
-    )
-}
-
-private fun stopPlaying(player: MediaPlayer?) {
-    player?.stop()
-    player?.release()
-}
-
-private fun startRecording(recorderOnCalled: (MediaRecorder) -> Unit, dataSource: String, context: Context) {
-    recorderOnCalled(
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> MediaRecorder(context)
-            else -> MediaRecorder()
-        }.apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            setOutputFile(dataSource)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-
-            try {
-                prepare()
-            } catch (e: IOException) {
-                Timber.d("startRecording failed exception: $e")
-            }
-
-            start()
-        }
-    )
-}
-
-private fun stopRecording(recorder: MediaRecorder?) {
-    recorder?.stop()
-    recorder?.release()
 }
 
 @Composable

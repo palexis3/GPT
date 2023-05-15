@@ -32,10 +32,10 @@ class AudioManager(private var context: Context, private var filePath: String) {
             mediaRecorder?.start()
             true
         } catch (e: IOException) {
-            Timber.d("XXX-startRecording failed IOException: $e}")
+            Timber.d("startRecording failed IOException: $e}")
             false
         } catch (e: IllegalStateException) {
-            Timber.d("XXX-startRecording failed IllegalStateException: $e")
+            Timber.d("startRecording failed IllegalStateException: $e")
             false
         }
     }
@@ -61,11 +61,11 @@ class AudioManager(private var context: Context, private var filePath: String) {
                 }
                 true
             } else {
-                Timber.d("XXX-startPlayback filePath non-existent: filePath: $filePath")
+                Timber.d("startPlayback filePath non-existent: filePath: $filePath")
                 false
             }
         } catch (e: Exception) {
-            Timber.d("XXX-startPlayback failed message: $e exception: ${e.message}")
+            Timber.d("startPlayback failed message: $e exception: ${e.message}")
             false
         }
     }

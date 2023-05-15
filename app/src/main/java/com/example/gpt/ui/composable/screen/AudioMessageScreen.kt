@@ -10,8 +10,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -21,13 +21,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.gpt.R
+import com.example.gpt.ui.theme.MediumPadding
 import com.example.gpt.ui.viewmodel.AudioViewModel
 import com.example.gpt.utils.createAudioFilePath
+import com.example.gpt.utils.fileIsNotEmpty
 
 @Composable
 fun AudioMessageScreen(
@@ -57,11 +61,15 @@ fun AudioMessageScreen(
         })
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(MediumPadding),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         ShowPlayButton(
             context = context,
+            filePath = audioFilePath,
             startPlaying = startPlaying,
             onPlay = { shouldPlay ->
                 startPlaying = shouldPlay
@@ -69,7 +77,11 @@ fun AudioMessageScreen(
                 if (shouldPlay) {
                     val wasPlaybackSuccessful = audioManager.startPlayback()
                     if (!wasPlaybackSuccessful) {
-                        Toast.makeText(context, "There was an error with playback", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "There was an error with playback",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 } else {
                     audioManager.stopPlayback()
@@ -98,21 +110,19 @@ fun AudioMessageScreen(
 @Composable
 fun ShowPlayButton(
     context: Context,
+    filePath: String,
     onPlay: (Boolean) -> Unit,
     startPlaying: Boolean
 ) {
     Button(
-        enabled = hasMicrophone(context),
+        enabled = context.fileIsNotEmpty(filePath),
         onClick = {
             onPlay(!startPlaying)
         }) {
-        Icon(
-            imageVector = when (startPlaying) {
-                true -> Icons.Filled.Done
-                false -> Icons.Filled.PlayArrow
-            },
-            contentDescription = "Play"
-        )
+        when (startPlaying) {
+            true -> Icon(painterResource(id = R.drawable.pause_icon), "pause")
+            false -> Icon(imageVector = Icons.Filled.PlayArrow, contentDescription = "play")
+        }
         Text(
             text = when (startPlaying) {
                 true -> "Stop playing"
@@ -134,13 +144,10 @@ fun ShowRecordButton(
         onClick = {
             onRecord(!startRecording)
         }) {
-        Icon(
-            imageVector = when (startRecording) {
-                true -> Icons.Filled.Done
-                false -> Icons.Filled.PlayArrow
-            },
-            contentDescription = "Play"
-        )
+        when (startRecording) {
+            true -> Icon(painterResource(id = R.drawable.pause_icon), "pause")
+            false -> Icon(imageVector = Icons.Filled.PlayArrow, contentDescription = "play")
+        }
         Text(
             text = when (startRecording) {
                 true -> "Stop recording"

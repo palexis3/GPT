@@ -1,5 +1,5 @@
 package com.example.gpt.data.model.audio
 
-data class CreateAudioResponse(
+data class AudioCreateResponse(
     val text: String
 )

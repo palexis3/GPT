@@ -55,8 +55,8 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.gpt.R
+import com.example.gpt.ui.composable.ShowMessageContentCard
 import com.example.gpt.ui.composable.ShowLoading
-import com.example.gpt.ui.composable.TypeWriter
 import com.example.gpt.ui.theme.MediumPadding
 import com.example.gpt.ui.viewmodel.ImageMessageUiState
 import com.example.gpt.ui.viewmodel.ImageViewModel
@@ -218,8 +218,7 @@ fun ImageListState(
                     ShowQueryText(text = savedQuery)
                 }
                 item {
-                    // TODO: Wrap in card with padding
-                    TypeWriter(
+                    ShowMessageContentCard(
                         text = stringResource(id = R.string.error),
                         modifier = Modifier.padding(
                             start = 12.dp,

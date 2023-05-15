@@ -10,6 +10,8 @@
     <string name="images_for">Image results for: %s</string>
 
     <string name="audio_permission_denied">Audio permission has been denied.</string>
+    <string name="audio_file_transcribe">Transcribe following audio: %s</string>
+    <string name="send">Send</string>
 
     <string name="settings">Settings</string>
     <string name="api_key">API Key</string>
@@ -20,4 +22,6 @@
     <string name="show_and_save_history">Show And Save Chat History</string>
     <string name="on">On</string>
     <string name="off">Off</string>
+
+
 </resources>

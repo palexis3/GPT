@@ -1,6 +1,8 @@
 package com.example.gpt.data.model.audio
 
-data class CreateAudioRequest(
-    val file: String,
+import java.io.File
+
+data class AudioCreateRequest(
+    val file: File,
     val model: String = "whisper-1"
 )

@@ -27,8 +27,8 @@ interface OpenAIApi {
         @Body body: RequestBody
     ): AudioCreateResponse
 
-    @POST("/v1/audio/transcriptions")
+    @POST("/v1/audio/translations")
     suspend fun createTranslation(
-        @Body createAudioRequest: AudioCreateRequest
+        @Body body: RequestBody
     ): AudioCreateResponse
 }

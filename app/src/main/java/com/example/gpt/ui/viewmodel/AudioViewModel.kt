@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.example.gpt.utils.Result
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.update
 
 sealed interface AudioMessageUiState {
@@ -35,10 +36,21 @@ class AudioViewModel @Inject constructor(
 
     fun createTranscription(audioFile: File) {
         val request = AudioCreateRequest(file = audioFile)
+        val flow = audioRepository.getTranscription(request)
 
+        renderAudioMessageUi(flow)
+    }
+
+    fun createTranslation(audioFile: File) {
+        val request = AudioCreateRequest(file = audioFile)
+        val flow = audioRepository.getTranslation(request)
+
+        renderAudioMessageUi(flow)
+    }
+
+    private fun renderAudioMessageUi(flow: Flow<AudioMessageUi>) {
         viewModelScope.launch(Dispatchers.IO) {
-            audioRepository
-                .getTranscription(request)
+            flow
                 .asResult()
                 .collect { result ->
                     val audioMessageUiState = when (result) {
@@ -52,6 +64,13 @@ class AudioViewModel @Inject constructor(
 
                     _audioMessageUiState.update { audioMessageUiState }
                 }
+
+        }
+    }
+
+    fun resetAudioUiFlow() {
+        viewModelScope.launch {
+            _audioMessageUiState.update { AudioMessageUiState.Uninitialized }
         }
     }
 }

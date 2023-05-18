@@ -16,7 +16,21 @@ class AudioRepositoryImpl @Inject constructor(
 ) : AudioRepository {
 
     override fun getTranscription(request: AudioCreateRequest): Flow<AudioMessageUi> = flow {
-        val formRequest: RequestBody = MultipartBody.Builder()
+        val formRequest = getFormRequest(request)
+        val response = api.createTranscription(formRequest)
+        val audioMessageUi = AudioMessageUi(text = response.text)
+        emit(audioMessageUi)
+    }
+
+    override fun getTranslation(request: AudioCreateRequest): Flow<AudioMessageUi> = flow {
+        val formRequest = getFormRequest(request)
+        val response = api.createTranslation(formRequest)
+        val audioMessageUi = AudioMessageUi(text = response.text)
+        emit(audioMessageUi)
+    }
+
+    private fun getFormRequest(request: AudioCreateRequest): RequestBody {
+        return MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("model", request.model)
             .addFormDataPart(
@@ -24,9 +38,5 @@ class AudioRepositoryImpl @Inject constructor(
                 body = request.file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
             )
             .build()
-
-        val response = api.createTranscription(formRequest)
-        val audioMessageUi = AudioMessageUi(text = response.text)
-        emit(audioMessageUi)
     }
 }

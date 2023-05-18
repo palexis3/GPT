@@ -112,6 +112,10 @@ fun AudioMessageScreen(
             onRecord = { shouldRecord ->
                 startRecording = shouldRecord
 
+                if (shouldRecord) {
+                    audioViewModel.resetAudioUiFlow()
+                }
+
                 if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
                     if (shouldRecord) {
                         audioManager.startRecording()
@@ -177,13 +181,13 @@ fun AudioMessageScreen(
 
                 Button(
                     onClick = {
-                        audioViewModel.createTranscription(audioFile)
+                        audioViewModel.createTranslation(audioFile)
                     }) {
                     Text(text = stringResource(id = R.string.translate_audio))
                 }
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             ShowAudioMessageUiState(
                 modifier = Modifier.align(End),

@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface AudioRepository {
 
     fun getTranscription(request: AudioCreateRequest) : Flow<AudioMessageUi>
+    fun getTranslation(request: AudioCreateRequest) : Flow<AudioMessageUi>
 }

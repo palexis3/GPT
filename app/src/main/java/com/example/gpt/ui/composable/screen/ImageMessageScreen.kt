@@ -55,7 +55,7 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.gpt.R
-import com.example.gpt.ui.composable.ShowMessageContentCard
+import com.example.gpt.ui.composable.ShowMessageContent
 import com.example.gpt.ui.composable.ShowLoading
 import com.example.gpt.ui.theme.MediumPadding
 import com.example.gpt.ui.viewmodel.ImageMessageUiState
@@ -218,7 +218,7 @@ fun ImageListState(
                     ShowQueryText(text = savedQuery)
                 }
                 item {
-                    ShowMessageContentCard(
+                    ShowMessageContent(
                         text = stringResource(id = R.string.error),
                         modifier = Modifier.padding(
                             start = 12.dp,

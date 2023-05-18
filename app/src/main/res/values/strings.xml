@@ -10,7 +10,6 @@
     <string name="images_for">Image results for: %s</string>
 
     <string name="audio_permission_denied">Audio permission has been denied.</string>
-    <string name="audio_file_transcribe">Transcribe following audio: %s</string>
     <string name="send">Send</string>
 
     <string name="settings">Settings</string>
@@ -23,5 +22,16 @@
     <string name="on">On</string>
     <string name="off">Off</string>
 
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
+    <string name="record_audio">Record Audio</string>
+    <string name="playback_audio">Playback Audio</string>
+    <string name="playback_error">There was an error with playback</string>
+    <string name="transcribe_audio">Transcribe</string>
+    <string name="translate_audio">Translate</string>
+    <string name="stop_recording">Stop Recording</string>
+    <string name="start_recording">Start Recording</string>
+    <string name="stop_playback">Stop Playback</string>
+    <string name="start_playback">Start Playback</string>
 
 </resources>

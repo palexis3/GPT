@@ -16,9 +16,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,15 +40,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gpt.R
+import com.example.gpt.ui.composable.ShowCardHeader
 import com.example.gpt.ui.composable.ShowLoading
-import com.example.gpt.ui.composable.ShowMessageContentCard
+import com.example.gpt.ui.composable.ShowMessageContent
 import com.example.gpt.ui.theme.MediumPadding
 import com.example.gpt.ui.viewmodel.AudioMessageUiState
 import com.example.gpt.ui.viewmodel.AudioViewModel
@@ -85,7 +94,17 @@ fun AudioMessageScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(MediumPadding)
+            .verticalScroll(rememberScrollState())
     ) {
+        Text(
+            modifier = Modifier.align(alignment = CenterHorizontally),
+            text = stringResource(id = R.string.record_audio),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
         ShowRecordButton(
             modifier = Modifier.align(alignment = CenterHorizontally),
             context = context,
@@ -104,7 +123,41 @@ fun AudioMessageScreen(
                 }
             })
 
-        if (fileIsNotEmpty(audioFile)) {
+        Spacer(modifier = Modifier.height(30.dp))
+
+        if (fileIsNotEmpty(audioFile) && !startRecording) {
+            Text(
+                modifier = Modifier.align(alignment = CenterHorizontally),
+                text = stringResource(id = R.string.playback_audio),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            ShowPlayButton(
+                modifier = Modifier.align(alignment = CenterHorizontally),
+                audioFile = audioFile,
+                startPlaying = startPlaying,
+                onPlay = { shouldPlay ->
+                    startPlaying = shouldPlay
+
+                    if (shouldPlay) {
+                        val wasPlaybackSuccessful = audioManager.startPlayback()
+                        if (!wasPlaybackSuccessful) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.playback_error),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        audioManager.stopPlayback()
+                    }
+                })
+
+            Spacer(modifier = Modifier.height(30.dp))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -112,50 +165,31 @@ fun AudioMessageScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ShowPlayButton(
-                    audioFile = audioFile,
-                    startPlaying = startPlaying,
-                    onPlay = { shouldPlay ->
-                        startPlaying = shouldPlay
 
-                        if (shouldPlay) {
-                            val wasPlaybackSuccessful = audioManager.startPlayback()
-                            if (!wasPlaybackSuccessful) {
-                                Toast.makeText(
-                                    context,
-                                    "There was an error with playback",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        } else {
-                            audioManager.stopPlayback()
-                        }
-                    })
+                Button(
+                    onClick = {
+                        audioViewModel.createTranscription(audioFile)
+                    }) {
+                    Text(text = stringResource(id = R.string.transcribe_audio))
+                }
 
                 Spacer(modifier = Modifier.width(4.dp))
 
-                Text(
-                    text = stringResource(id = R.string.audio_file_transcribe, audioFile.name),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
+                Button(
+                    onClick = {
+                        audioViewModel.createTranscription(audioFile)
+                    }) {
+                    Text(text = stringResource(id = R.string.translate_audio))
+                }
             }
 
-            Modifier.height(8.dp)
+            Spacer(modifier = Modifier.height(30.dp))
 
-            Button(
-                modifier = Modifier.align(alignment = CenterHorizontally),
-                onClick = {
-                    audioViewModel.createTranscription(audioFile)
-                }) {
-                Text(text = stringResource(id = R.string.send))
-            }
+            ShowAudioMessageUiState(
+                modifier = Modifier.align(End),
+                audioMessageUiState
+            )
         }
-
-        ShowAudioMessageUiState(
-            modifier = Modifier.align(End),
-            audioMessageUiState
-        )
     }
 }
 
@@ -170,23 +204,69 @@ fun ShowAudioMessageUiState(
         when (audioMessageUiState) {
             is AudioMessageUiState.Uninitialized -> {}
             is AudioMessageUiState.Loading -> ShowLoading()
-            is AudioMessageUiState.Error -> {
-                ShowMessageContentCard(text = stringResource(id = R.string.error))
-            }
+            is AudioMessageUiState.Error -> ShowAudioMessageContent(text = stringResource(id = R.string.error))
             is AudioMessageUiState.Success -> {
-                ShowMessageContentCard(text = audioMessageUiState.audioMessageUi.text)
+                ShowAudioMessageContent(text = audioMessageUiState.audioMessageUi.text)
             }
         }
     }
 }
 
 @Composable
+fun ShowAudioMessageContent(text: String) {
+    val cardBackgroundColor = when (text) {
+        "Error. Please try again" -> MaterialTheme.colorScheme.errorContainer
+        else -> MaterialTheme.colorScheme.secondaryContainer
+    }
+
+    val color =  when (text) {
+        "Error. Please try again" -> MaterialTheme.colorScheme.error
+        else -> MaterialTheme.colorScheme.secondary
+    }
+
+    val messageModifier: Modifier = Modifier.padding(
+        start = 12.dp,
+        top = 4.dp,
+        bottom = 6.dp,
+        end = 12.dp
+    )
+
+    Card(
+        modifier = Modifier
+            .widthIn(200.dp, 275.dp)
+            .padding(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = cardBackgroundColor
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        ShowCardHeader(text = stringResource(id = R.string.gpt))
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        ShowMessageContent(
+            text = text,
+            modifier = messageModifier,
+            textStyle = TextStyle(
+                color =color,
+                fontSize = 18.sp
+            )
+        )
+    }
+}
+
+@Composable
 fun ShowPlayButton(
+    modifier: Modifier,
     audioFile: File,
     onPlay: (Boolean) -> Unit,
     startPlaying: Boolean
 ) {
     Button(
+        modifier = modifier,
         enabled = fileIsNotEmpty(audioFile),
         onClick = {
             onPlay(!startPlaying)
@@ -195,6 +275,12 @@ fun ShowPlayButton(
             true -> Icon(painterResource(id = R.drawable.pause_icon), "pause")
             false -> Icon(imageVector = Icons.Filled.PlayArrow, contentDescription = "play")
         }
+        Text(
+            text = when (startPlaying) {
+                true -> stringResource(id = R.string.stop_playback)
+                false -> stringResource(id = R.string.start_playback)
+            }
+        )
     }
 }
 
@@ -205,7 +291,6 @@ fun ShowRecordButton(
     onRecord: (Boolean) -> Unit,
     startRecording: Boolean
 ) {
-
     Button(
         modifier = modifier,
         enabled = context.hasMicrophone(),
@@ -218,8 +303,8 @@ fun ShowRecordButton(
         }
         Text(
             text = when (startRecording) {
-                true -> "Stop Recording"
-                false -> "Start Recording"
+                true -> stringResource(id = R.string.stop_recording)
+                false -> stringResource(id = R.string.start_recording)
             }
         )
     }

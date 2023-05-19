@@ -57,7 +57,10 @@ import coil.compose.AsyncImage
 import com.example.gpt.R
 import com.example.gpt.ui.composable.ShowMessageContent
 import com.example.gpt.ui.composable.ShowLoading
-import com.example.gpt.ui.theme.MediumPadding
+import com.example.gpt.ui.theme.EIGHT_DP
+import com.example.gpt.ui.theme.FOUR_DP
+import com.example.gpt.ui.theme.SIX_DP
+import com.example.gpt.ui.theme.TWELVE_DP
 import com.example.gpt.ui.viewmodel.ImageMessageUiState
 import com.example.gpt.ui.viewmodel.ImageViewModel
 
@@ -83,7 +86,7 @@ fun ImageMessageScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(MediumPadding),
+            .padding(TWELVE_DP),
         verticalArrangement = Arrangement.Top
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -93,7 +96,7 @@ fun ImageMessageScreen(
                         color = MaterialTheme.colorScheme.background,
                         shape = RectangleShape
                     )
-                    .padding(MediumPadding)
+                    .padding(TWELVE_DP)
                     .weight(1f),
                 value = query,
                 textStyle = MaterialTheme.typography.titleMedium,
@@ -140,7 +143,7 @@ fun ImageMessageScreen(
                             fontWeight = FontWeight.Bold
                         )
                     },
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(EIGHT_DP),
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded) },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(
                         focusedIndicatorColor = Color.Transparent,
@@ -165,7 +168,7 @@ fun ImageMessageScreen(
                 }
             }
 
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(SIX_DP))
 
             Button(
                 modifier = Modifier.align(alignment = Alignment.End),
@@ -181,7 +184,7 @@ fun ImageMessageScreen(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(TWELVE_DP))
 
         ImageListState(
             context,
@@ -200,8 +203,8 @@ fun ImageListState(
     LazyColumn(
         verticalArrangement = Arrangement.SpaceEvenly,
         contentPadding = PaddingValues(
-            top = MediumPadding,
-            bottom = MediumPadding
+            top = TWELVE_DP,
+            bottom = TWELVE_DP
         )
     ) {
         when (imageMessageUiState) {
@@ -221,10 +224,10 @@ fun ImageListState(
                     ShowMessageContent(
                         text = stringResource(id = R.string.error),
                         modifier = Modifier.padding(
-                            start = 12.dp,
-                            top = 4.dp,
-                            bottom = 6.dp,
-                            end = 12.dp
+                            start = TWELVE_DP,
+                            top = FOUR_DP,
+                            bottom = SIX_DP,
+                            end = TWELVE_DP
                         ),
                         textStyle = TextStyle(
                             color = MaterialTheme.colorScheme.error,
@@ -252,7 +255,7 @@ fun ImageListState(
 fun ShowQueryText(context: Context, text: String) {
     Text(
         text = context.getString(R.string.images_for, text),
-        modifier = Modifier.padding(MediumPadding),
+        modifier = Modifier.padding(TWELVE_DP),
         style = MaterialTheme.typography.titleMedium,
         color = Color.White,
         fontStyle = FontStyle.Italic
@@ -264,14 +267,14 @@ fun ShowImage(url: String) {
     if (url.isNotEmpty()) {
         Card(
             modifier = Modifier
-                .padding(top = 4.dp, start = 12.dp, end = 12.dp, bottom = 4.dp),
+                .padding(top = FOUR_DP, start = TWELVE_DP, end = TWELVE_DP, bottom = FOUR_DP),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
+                defaultElevation = EIGHT_DP
             ),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(TWELVE_DP)
         ) {
             AsyncImage(
                 model = url,

@@ -58,7 +58,10 @@ import com.example.gpt.data.model.chat.ChatMessageUi
 import com.example.gpt.ui.composable.ShowCardHeader
 import com.example.gpt.ui.composable.ShowLoading
 import com.example.gpt.ui.composable.ShowMessageContent
-import com.example.gpt.ui.theme.MediumPadding
+import com.example.gpt.ui.theme.EIGHT_DP
+import com.example.gpt.ui.theme.FOUR_DP
+import com.example.gpt.ui.theme.SIX_DP
+import com.example.gpt.ui.theme.TWELVE_DP
 import com.example.gpt.ui.viewmodel.ChatMessageUiState
 import com.example.gpt.ui.viewmodel.ChatViewModel
 import com.example.gpt.ui.viewmodel.SettingsViewModel
@@ -140,7 +143,7 @@ fun ChatMessageScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(MediumPadding),
+            .padding(TWELVE_DP),
         verticalArrangement = Arrangement.Bottom
     ) {
         LazyColumn(
@@ -160,7 +163,7 @@ fun ChatMessageScreen(
             }
         }
 
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(SIX_DP))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -173,7 +176,7 @@ fun ChatMessageScreen(
                         color = MaterialTheme.colorScheme.background,
                         shape = RectangleShape
                     )
-                    .padding(MediumPadding)
+                    .padding(TWELVE_DP)
                     .weight(1f),
                 value = inputString,
                 textStyle = MaterialTheme.typography.titleMedium,
@@ -261,14 +264,14 @@ fun ShowMessage(
         Card(
             modifier = Modifier
                 .widthIn(200.dp, 275.dp)
-                .padding(4.dp),
+                .padding(FOUR_DP),
             colors = CardDefaults.cardColors(
                 containerColor = cardBackgroundColor
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
+                defaultElevation = EIGHT_DP
             ),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(TWELVE_DP)
         ) {
             val message = if (isErrorMessage) {
                 stringResource(id = R.string.error)
@@ -276,10 +279,10 @@ fun ShowMessage(
                 chatMessageUi.content
             }
             val messageModifier: Modifier = Modifier.padding(
-                start = 12.dp,
-                top = 4.dp,
-                bottom = 6.dp,
-                end = 12.dp
+                start = TWELVE_DP,
+                top = FOUR_DP,
+                bottom = SIX_DP,
+                end = TWELVE_DP
             )
 
             Column {
@@ -319,5 +322,5 @@ fun ShowMessage(
             }
         }
     }
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(EIGHT_DP))
 }

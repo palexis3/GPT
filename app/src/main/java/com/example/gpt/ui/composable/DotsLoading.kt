@@ -19,8 +19,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.gpt.ui.theme.TWELVE_DP
 
-val dotSize = 12.dp
+val dotSize = TWELVE_DP
 const val delayUnit = 300
 
 // Dots loading inspired by https://gist.github.com/EugeneTheDev/a27664cb7e7899f964348b05883cbccd

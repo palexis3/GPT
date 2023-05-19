@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowApp() {
+    val context = LocalContext.current
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -57,16 +59,17 @@ fun ShowApp() {
             bottomBar = {
                 NavigationBar {
                     bottomNavItems.forEach { screen ->
+                        val currentRoute = context.getString(screen.route)
                         NavigationBarItem(
                             icon = {
                                 Icon(
                                     painter = painterResource(id = screen.icon),
-                                    contentDescription = screen.route
+                                    contentDescription = currentRoute
                                 )
                             },
-                            label = { Text(screen.route) },
-                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                            onClick = { navController.navigate(screen.route) }
+                            label = { Text(currentRoute) },
+                            selected = currentDestination?.hierarchy?.any { it.route == currentRoute } == true,
+                            onClick = { navController.navigate(currentRoute) }
                         )
                     }
                 }
@@ -74,13 +77,13 @@ fun ShowApp() {
         ) { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = Screen.Chat.route,
+                startDestination = context.getString(Screen.Chat.route),
                 Modifier.padding(innerPadding)
             ) {
-                composable(Screen.Chat.route) { ChatMessageScreen() }
-                composable(Screen.Image.route) { ImageMessageScreen() }
-                composable(Screen.Audio.route) { AudioMessageScreen() }
-                composable(Screen.Settings.route) { SettingsScreen() }
+                composable(context.getString(Screen.Chat.route)) { ChatMessageScreen() }
+                composable(context.getString(Screen.Image.route)) { ImageMessageScreen() }
+                composable(context.getString(Screen.Audio.route)) { AudioMessageScreen() }
+                composable(context.getString(Screen.Settings.route)) { SettingsScreen() }
             }
         }
     }

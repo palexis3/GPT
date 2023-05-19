@@ -52,7 +52,10 @@ import com.example.gpt.R
 import com.example.gpt.ui.composable.ShowCardHeader
 import com.example.gpt.ui.composable.ShowLoading
 import com.example.gpt.ui.composable.ShowMessageContent
-import com.example.gpt.ui.theme.MediumPadding
+import com.example.gpt.ui.theme.EIGHT_DP
+import com.example.gpt.ui.theme.FOUR_DP
+import com.example.gpt.ui.theme.SIX_DP
+import com.example.gpt.ui.theme.TWELVE_DP
 import com.example.gpt.ui.viewmodel.AudioMessageUiState
 import com.example.gpt.ui.viewmodel.AudioViewModel
 import com.example.gpt.utils.createAudioFile
@@ -93,7 +96,7 @@ fun AudioMessageScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(MediumPadding)
+            .padding(TWELVE_DP)
             .verticalScroll(rememberScrollState())
     ) {
         Text(
@@ -103,7 +106,7 @@ fun AudioMessageScreen(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(SIX_DP))
 
         ShowRecordButton(
             modifier = Modifier.align(alignment = CenterHorizontally),
@@ -137,7 +140,7 @@ fun AudioMessageScreen(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(SIX_DP))
 
             ShowPlayButton(
                 modifier = Modifier.align(alignment = CenterHorizontally),
@@ -165,7 +168,7 @@ fun AudioMessageScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(MediumPadding),
+                    .padding(TWELVE_DP),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -177,7 +180,7 @@ fun AudioMessageScreen(
                     Text(text = stringResource(id = R.string.transcribe_audio))
                 }
 
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(FOUR_DP))
 
                 Button(
                     onClick = {
@@ -229,23 +232,23 @@ fun ShowAudioMessageContent(text: String) {
     }
 
     val messageModifier: Modifier = Modifier.padding(
-        start = 12.dp,
-        top = 4.dp,
-        bottom = 6.dp,
-        end = 12.dp
+        start = TWELVE_DP,
+        top = FOUR_DP,
+        bottom = SIX_DP,
+        end = TWELVE_DP
     )
 
     Card(
         modifier = Modifier
             .widthIn(200.dp, 275.dp)
-            .padding(4.dp),
+            .padding(FOUR_DP),
         colors = CardDefaults.cardColors(
             containerColor = cardBackgroundColor
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
+            defaultElevation = EIGHT_DP
         ),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(TWELVE_DP)
     ) {
         ShowCardHeader(text = stringResource(id = R.string.gpt))
 

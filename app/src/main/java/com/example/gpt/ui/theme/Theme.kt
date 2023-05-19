@@ -6,7 +6,15 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 
-val MediumPadding = 12.dp
+val FOUR_DP = 4.dp
+val SIX_DP = 6.dp
+val EIGHT_DP = 8.dp
+val TEN_DP = 10.dp
+val TWELVE_DP = 12.dp
+val TWENTY_DP = 20.dp
+val THIRTY_SIX_DP = 36.dp
+val FORTY_EIGHT_DP = 48.dp
+
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,

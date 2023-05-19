@@ -22,7 +22,7 @@ patterns and other libraries.
 ## Technologies
 
 - Kotlin
-- Flow
+- Flow/StateFlow
 - Jetpack Compose
 - AndroidX/Jetpack
 - Dagger Hilt
@@ -30,6 +30,7 @@ patterns and other libraries.
 - Retrofit/OkHttp/Moshi
 - Room
 - Coil
+- MVVM
 - MediaPlayer/MediaRecorder
 
 ## Development

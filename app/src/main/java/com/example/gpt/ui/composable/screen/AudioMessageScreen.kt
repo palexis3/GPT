@@ -116,6 +116,7 @@ fun AudioMessageScreen(
                 startRecording = shouldRecord
 
                 if (shouldRecord) {
+                    startPlaying = false
                     audioViewModel.resetAudioUiFlow()
                 }
 

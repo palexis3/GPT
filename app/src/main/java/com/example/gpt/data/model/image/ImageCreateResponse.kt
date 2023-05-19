@@ -1,6 +1,6 @@
 package com.example.gpt.data.model.image
 
-data class CreateImageResponse(
+data class ImageCreateResponse(
     val data: List<Image>
 )
 

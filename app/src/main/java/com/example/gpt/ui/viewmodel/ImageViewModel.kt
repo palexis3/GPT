@@ -2,7 +2,7 @@ package com.example.gpt.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gpt.data.model.image.CreateImageRequest
+import com.example.gpt.data.model.image.ImageCreateRequest
 import com.example.gpt.data.model.image.ImageMessageUi
 import com.example.gpt.data.repository.image.ImageRepository
 import com.example.gpt.utils.asResult
@@ -33,7 +33,7 @@ class ImageViewModel @Inject constructor(
         get() = _imageMessageUiState.asStateFlow()
 
     fun getImages(prompt: String, numOf: Int = 1) {
-        val request = CreateImageRequest(
+        val request = ImageCreateRequest(
             prompt = prompt, n = numOf
         )
 

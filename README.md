@@ -15,7 +15,8 @@ patterns and other libraries.
 
 |                       Chat Completion                               |                          Image Generation                           |                              Audio                                  |                 Show and Save Chat History                          |                                                              
 | --------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|  
-| <video src="https://tinyurl.com/4vj2xsud" width="200" height="400"> | <video src="https://tinyurl.com/24mytrwm" width="200" height="400"> | <video src="https://tinyurl.com/cx3haevj" width="200" height="400"> | <video src="https://tinyurl.com/yc8a3e6h" width="200" height="400"> |
+| <img src="https://tinyurl.com/3aaykuww" width="200" height="400">   | <img src="https://tinyurl.com/3rjbczpm" width="200" height="400">   | <img src="https://tinyurl.com/47enbyj5" width="200" height="400">   | <img src="https://tinyurl.com/26ypyexh" width="200" height="400">   | 			                                                                                                                                      
+	
 
 
 ## Technologies
@@ -52,3 +53,4 @@ License
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
+	

@@ -1,5 +1,6 @@
 package com.example.gpt.ui.composable.screen
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -69,6 +69,7 @@ import com.example.gpt.ui.viewmodel.ImageViewModel
 fun ImageMessageScreen(
     imageViewModel: ImageViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var query by remember { mutableStateOf("") }
@@ -80,7 +81,9 @@ fun ImageMessageScreen(
     val imageMessageUiState: ImageMessageUiState by imageViewModel.imageMessageUiState.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(MediumPadding),
         verticalArrangement = Arrangement.Top
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -119,73 +122,69 @@ fun ImageMessageScreen(
             )
         }
 
-        Row(
-            modifier = Modifier.padding(MediumPadding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (query.trim().isNotEmpty()) {
-                ExposedDropdownMenuBox(
-                    modifier = Modifier.weight(1f),
-                    expanded = dropdownExpanded,
-                    onExpandedChange = { dropdownExpanded = !dropdownExpanded }
-                ) {
-                    TextField(
-                        modifier = Modifier
-                            .menuAnchor(),
-                        value = selectedNum.toString(),
-                        onValueChange = {},
-                        readOnly = true,
-                        label = {
-                            Text(
-                                stringResource(id = R.string.num_of_image),
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        shape = RoundedCornerShape(8.dp),
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded) },
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
+        if (query.trim().isNotEmpty()) {
+            ExposedDropdownMenuBox(
+                modifier = Modifier.align(alignment = Alignment.End),
+                expanded = dropdownExpanded,
+                onExpandedChange = { dropdownExpanded = !dropdownExpanded }
+            ) {
+                TextField(
+                    modifier = Modifier
+                        .menuAnchor(),
+                    value = selectedNum.toString(),
+                    onValueChange = {},
+                    readOnly = true,
+                    label = {
+                        Text(
+                            stringResource(id = R.string.num_of_image),
+                            fontWeight = FontWeight.Bold
                         )
+                    },
+                    shape = RoundedCornerShape(8.dp),
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded) },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
                     )
+                )
 
-                    ExposedDropdownMenu(
-                        expanded = dropdownExpanded,
-                        onDismissRequest = { dropdownExpanded = false }
-                    ) {
-                        (1..10).forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item.toString()) },
-                                onClick = {
-                                    selectedNum = item
-                                    dropdownExpanded = false
-                                },
-                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                Button(
-                    onClick = {
-                        keyboardController?.hide()
-                        imageViewModel.getImages(query.trim(), selectedNum)
-                        savedQuery = query
-                        query = ""
-                        imageViewModel.resetImageUiFlow()
-                    }
+                ExposedDropdownMenu(
+                    expanded = dropdownExpanded,
+                    onDismissRequest = { dropdownExpanded = false }
                 ) {
-                    Text(text = stringResource(id = R.string.search_image))
+                    (1..10).forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(text = item.toString()) },
+                            onClick = {
+                                selectedNum = item
+                                dropdownExpanded = false
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                        )
+                    }
                 }
+            }
+
+            Spacer(Modifier.height(6.dp))
+
+            Button(
+                modifier = Modifier.align(alignment = Alignment.End),
+                onClick = {
+                    keyboardController?.hide()
+                    imageViewModel.getImages(query.trim(), selectedNum)
+                    savedQuery = query
+                    query = ""
+                    imageViewModel.resetImageUiFlow()
+                }
+            ) {
+                Text(text = stringResource(id = R.string.search_image))
             }
         }
 
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(12.dp))
 
         ImageListState(
+            context,
             imageMessageUiState,
             savedQuery
         )
@@ -194,6 +193,7 @@ fun ImageMessageScreen(
 
 @Composable
 fun ImageListState(
+    context: Context,
     imageMessageUiState: ImageMessageUiState,
     savedQuery: String
 ) {
@@ -215,7 +215,7 @@ fun ImageListState(
             }
             is ImageMessageUiState.Error -> {
                 item {
-                    ShowQueryText(text = savedQuery)
+                    ShowQueryText(context, text = savedQuery)
                 }
                 item {
                     ShowMessageContent(
@@ -235,7 +235,10 @@ fun ImageListState(
             }
             is ImageMessageUiState.Success -> {
                 item {
-                    ShowQueryText(text = savedQuery)
+                    ShowQueryText(
+                        context,
+                        text = savedQuery
+                    )
                 }
                 items(imageMessageUiState.imageMessageUi.images) { imageUrl ->
                     ShowImage(url = imageUrl)
@@ -246,9 +249,7 @@ fun ImageListState(
 }
 
 @Composable
-fun ShowQueryText(text: String) {
-    val context = LocalContext.current
-
+fun ShowQueryText(context: Context, text: String) {
     Text(
         text = context.getString(R.string.images_for, text),
         modifier = Modifier.padding(MediumPadding),

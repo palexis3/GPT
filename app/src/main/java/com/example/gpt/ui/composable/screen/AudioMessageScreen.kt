@@ -222,12 +222,12 @@ fun ShowAudioMessageUiState(
 @Composable
 fun ShowAudioMessageContent(text: String) {
     val cardBackgroundColor = when (text) {
-        "Error. Please try again" -> MaterialTheme.colorScheme.errorContainer
+        stringResource(id = R.string.error) -> MaterialTheme.colorScheme.errorContainer
         else -> MaterialTheme.colorScheme.secondaryContainer
     }
 
     val color =  when (text) {
-        "Error. Please try again" -> MaterialTheme.colorScheme.error
+        stringResource(id = R.string.error) -> MaterialTheme.colorScheme.error
         else -> MaterialTheme.colorScheme.secondary
     }
 

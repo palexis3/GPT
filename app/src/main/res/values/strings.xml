@@ -8,9 +8,13 @@
     <string name="search_image">Search Image</string>
     <string name="num_of_image">Number of images</string>
     <string name="images_for">Image results for: %s</string>
-
     <string name="audio_permission_denied">Audio permission has been denied.</string>
     <string name="send">Send</string>
+
+    <string name="chat_nav">chat</string>
+    <string name="image_nav">image</string>
+    <string name="audio_nav">audio</string>
+    <string name="settings_nav">setting</string>
 
     <string name="settings">Settings</string>
     <string name="api_key">API Key</string>

@@ -9,13 +9,14 @@ import com.example.gpt.data.model.chat.toChatMessagesUi
 import com.example.gpt.data.remote.OpenAIApi
 import com.example.gpt.utils.MySettingPreferences
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.runBlocking
 
 class ChatRepositoryImpl @Inject constructor(
@@ -43,30 +44,30 @@ class ChatRepositoryImpl @Inject constructor(
     // Note: `getChatMessage` uses an offline approach where we first try to fetch the
     // locally saved chat message for a particular prompt otherwise in the case null is returned,
     // we fetch from the API
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun getChatMessage(request: ChatCompletionRequest): Flow<ChatMessageUi> {
         val prompt = request.messages[0].content
-
-        val localChatMessageUi = runBlocking {
-            getChatMessageFromLocal(prompt).firstOrNull()
-        }
         val shouldSaveMessage = runBlocking {
             settingPreferences.saveAndShowChatHistoryState.first()
         }
 
-        return getChatMessageFromApi(request)
-            .onStart {
+        return getChatMessageFromLocal(prompt)
+            .flatMapMerge { localChatMessageUi ->
                 if (localChatMessageUi != null) {
-                    emit(localChatMessageUi)
-                }
-            }.onEach { remoteChatMessageUi ->
-                // NOTE: Save successful response for this prompt typed in if setting
-                // preferences have been turned on.
-                if (shouldSaveMessage && remoteChatMessageUi != localChatMessageUi) {
-                    val newLocalMessages = ChatMessagesLocal(
-                        prompt = prompt,
-                        content = remoteChatMessageUi.content
-                    )
-                    saveChatMessages(newLocalMessages)
+                    flow { emit(localChatMessageUi) }
+                } else {
+                    getChatMessageFromApi(request)
+                        .onEach { remoteChatMessageUi ->
+                            // NOTE: Save successful response for this prompt typed in if setting
+                            // preferences have been turned on.
+                            if (shouldSaveMessage) {
+                                val newLocalMessages = ChatMessagesLocal(
+                                    prompt = prompt,
+                                    content = remoteChatMessageUi.content
+                                )
+                                saveChatMessages(newLocalMessages)
+                            }
+                        }
                 }
             }
     }

@@ -16,8 +16,6 @@ android {
         versionCode 1
         versionName "1.0"
 
-        buildConfigField "String", "OPEN_AI_KEY", OPEN_AI_KEY
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -26,7 +24,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

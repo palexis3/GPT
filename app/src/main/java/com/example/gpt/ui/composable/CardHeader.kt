@@ -7,13 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.gpt.ui.theme.FOUR_DP
+import com.example.gpt.ui.theme.TWELVE_DP
 
 @Composable
 fun ShowCardHeader(text: String) {
     Text(
-        modifier = Modifier.padding(start = 12.dp, top = 4.dp),
+        modifier = Modifier.padding(start = TWELVE_DP, top = FOUR_DP),
         text = text,
         color = MaterialTheme.colorScheme.tertiary,
         fontSize = 10.sp,

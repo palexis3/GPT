@@ -5,8 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
-import android.graphics.PixelFormat.RGBA_8888
-import android.hardware.HardwareBuffer.RGBA_8888
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore

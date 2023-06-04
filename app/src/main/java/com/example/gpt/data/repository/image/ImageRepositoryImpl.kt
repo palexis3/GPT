@@ -1,8 +1,12 @@
 package com.example.gpt.data.repository.image
 
+<<<<<<< HEAD
 import android.util.Log
 import com.example.gpt.data.model.image.Image
 import com.example.gpt.data.model.image.create.ImageCreateRequest
+=======
+import com.example.gpt.data.model.image.ImageCreateRequest
+>>>>>>> main
 import com.example.gpt.data.model.image.ImageMessage
 import com.example.gpt.data.model.image.ImageMessageUi
 import com.example.gpt.data.model.image.edit.ImageEditRequest
@@ -23,11 +27,20 @@ class ImageRepositoryImpl @Inject constructor(
     private val api: OpenAIApi
 ) : ImageRepository {
 
+<<<<<<< HEAD
     override fun getImages(imageCreateRequest: ImageCreateRequest): Flow<ImageMessageUi> =
         flow {
             val response = api.createImage(imageCreateRequest)
             val messageUi = processImageResponse(response.data)
             emit(messageUi)
+=======
+    override fun getImages(imageCreateRequest: ImageCreateRequest): Flow<ImageMessage> =
+        flow {
+            val response = api.createImage(imageCreateRequest)
+            val images = response.data.map { image -> image.url }
+            val imagesMessage = ImageMessage(images)
+            emit(imagesMessage)
+>>>>>>> main
         }
 
     override fun editImage(imageEditRequest: ImageEditRequest): Flow<ImageMessageUi> =

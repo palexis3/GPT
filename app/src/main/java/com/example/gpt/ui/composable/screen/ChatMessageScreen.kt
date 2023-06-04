@@ -49,6 +49,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gpt.R
 import com.example.gpt.data.model.LoadingMessageUi
@@ -56,8 +57,11 @@ import com.example.gpt.data.model.MessageUi
 import com.example.gpt.data.model.chat.ChatMessageUi
 import com.example.gpt.ui.composable.ShowCardHeader
 import com.example.gpt.ui.composable.ShowLoading
-import com.example.gpt.ui.composable.TypeWriter
-import com.example.gpt.ui.theme.MediumPadding
+import com.example.gpt.ui.composable.ShowMessageContent
+import com.example.gpt.ui.theme.EIGHT_DP
+import com.example.gpt.ui.theme.FOUR_DP
+import com.example.gpt.ui.theme.SIX_DP
+import com.example.gpt.ui.theme.TWELVE_DP
 import com.example.gpt.ui.viewmodel.ChatMessageUiState
 import com.example.gpt.ui.viewmodel.ChatViewModel
 import com.example.gpt.ui.viewmodel.SettingsViewModel
@@ -66,7 +70,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(
     ExperimentalMaterial3Api::class,
-    ExperimentalComposeUiApi::class,
+    ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class
 )
 @Composable
 fun ChatMessageScreen(
@@ -139,7 +143,7 @@ fun ChatMessageScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(MediumPadding),
+            .padding(TWELVE_DP),
         verticalArrangement = Arrangement.Bottom
     ) {
         LazyColumn(
@@ -159,7 +163,7 @@ fun ChatMessageScreen(
             }
         }
 
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(SIX_DP))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -172,7 +176,7 @@ fun ChatMessageScreen(
                         color = MaterialTheme.colorScheme.background,
                         shape = RectangleShape
                     )
-                    .padding(MediumPadding)
+                    .padding(TWELVE_DP)
                     .weight(1f),
                 value = inputString,
                 textStyle = MaterialTheme.typography.titleMedium,
@@ -260,20 +264,26 @@ fun ShowMessage(
         Card(
             modifier = Modifier
                 .widthIn(200.dp, 275.dp)
-                .padding(4.dp),
+                .padding(FOUR_DP),
             colors = CardDefaults.cardColors(
                 containerColor = cardBackgroundColor
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
+                defaultElevation = EIGHT_DP
             ),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(TWELVE_DP)
         ) {
             val message = if (isErrorMessage) {
                 stringResource(id = R.string.error)
             } else {
                 chatMessageUi.content
             }
+            val messageModifier: Modifier = Modifier.padding(
+                start = TWELVE_DP,
+                top = FOUR_DP,
+                bottom = SIX_DP,
+                end = TWELVE_DP
+            )
 
             Column {
                 ShowCardHeader(
@@ -286,14 +296,9 @@ fun ShowMessage(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 if (isChatAssistant || isErrorMessage) {
-                    TypeWriter(
+                    ShowMessageContent(
                         text = message,
-                        modifier = Modifier.padding(
-                            start = 12.dp,
-                            top = 4.dp,
-                            bottom = 6.dp,
-                            end = 12.dp
-                        ),
+                        modifier = messageModifier,
                         textStyle = TextStyle(
                             color = when {
                                 isChatAssistant -> MaterialTheme.colorScheme.secondary
@@ -304,17 +309,12 @@ fun ShowMessage(
                         onAnimationEnd = {
                             chatMessageUi.typeWriterSeenAlready = true
                         },
-                        typeWriterSeenAlready = chatMessageUi.typeWriterSeenAlready
+                        contentSeenAlready = chatMessageUi.typeWriterSeenAlready
                     )
                 } else {
                     Text(
                         text = message,
-                        modifier = Modifier.padding(
-                            start = 12.dp,
-                            top = 4.dp,
-                            bottom = 6.dp,
-                            end = 12.dp
-                        ),
+                        modifier = messageModifier,
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = 18.sp
                     )
@@ -322,5 +322,5 @@ fun ShowMessage(
             }
         }
     }
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(EIGHT_DP))
 }

@@ -1,5 +1,6 @@
 package com.example.gpt.data.remote
 
+<<<<<<< HEAD
 import com.example.gpt.data.model.audio.AudioCreateRequest
 import com.example.gpt.data.model.audio.AudioCreateResponse
 import com.example.gpt.data.model.chat.ChatCompletionRequest
@@ -9,6 +10,13 @@ import com.example.gpt.data.model.image.create.ImageCreateResponse
 import com.example.gpt.data.model.image.edit.ImageEditRequest
 import com.example.gpt.data.model.image.edit.ImageEditResponse
 import okhttp3.MultipartBody
+=======
+import com.example.gpt.data.model.audio.AudioCreateResponse
+import com.example.gpt.data.model.chat.ChatCompletionRequest
+import com.example.gpt.data.model.chat.ChatCompletionResponse
+import com.example.gpt.data.model.image.ImageCreateRequest
+import com.example.gpt.data.model.image.ImageCreateResponse
+>>>>>>> main
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.Headers
@@ -31,6 +39,7 @@ interface OpenAIApi {
 
     @POST("/v1/audio/transcriptions")
     suspend fun createTranscription(
+<<<<<<< HEAD
         @Body audioCreateRequest: AudioCreateRequest
     ): AudioCreateResponse
 
@@ -54,4 +63,13 @@ interface OpenAIApi {
         @Part("response_format") responseFormat: RequestBody,
         @Part image: MultipartBody.Part
     ): ImageEditResponse
+=======
+        @Body body: RequestBody
+    ): AudioCreateResponse
+
+    @POST("/v1/audio/translations")
+    suspend fun createTranslation(
+        @Body body: RequestBody
+    ): AudioCreateResponse
+>>>>>>> main
 }

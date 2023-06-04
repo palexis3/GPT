@@ -42,11 +42,18 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import com.example.gpt.R
-import com.example.gpt.ui.theme.MediumPadding
+import com.example.gpt.ui.theme.EIGHT_DP
+import com.example.gpt.ui.theme.FORTY_EIGHT_DP
+import com.example.gpt.ui.theme.FOUR_DP
+import com.example.gpt.ui.theme.SIX_DP
+import com.example.gpt.ui.theme.TEN_DP
+import com.example.gpt.ui.theme.TWELVE_DP
+import com.example.gpt.ui.theme.TWENTY_DP
 import com.example.gpt.utils.mask
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel()
@@ -63,7 +70,7 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(MediumPadding)
+            .padding(TWELVE_DP)
     ) {
         Text(
             text = stringResource(id = R.string.settings),
@@ -72,16 +79,16 @@ fun SettingsScreen(
             fontWeight = FontWeight.ExtraBold
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(FORTY_EIGHT_DP))
 
         Card(
-            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
+            modifier = Modifier.padding(top = EIGHT_DP, bottom = EIGHT_DP),
+            elevation = CardDefaults.cardElevation(FOUR_DP)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp, bottom = 20.dp, start = 10.dp, end = 4.dp),
+                    .padding(top = TWENTY_DP, bottom = TWENTY_DP, start = TEN_DP, end = FOUR_DP),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -92,7 +99,7 @@ fun SettingsScreen(
                         fontWeight = FontWeight.ExtraBold
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(TEN_DP))
 
                     when (apiKey) {
                         "" -> ShowEnterApiKey(newKeySelected = { apiKey ->
@@ -116,16 +123,16 @@ fun SettingsScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(TEN_DP))
 
         Card(
-            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
+            modifier = Modifier.padding(top = EIGHT_DP, bottom = EIGHT_DP),
+            elevation = CardDefaults.cardElevation(FOUR_DP)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp, bottom = 20.dp, start = 10.dp, end = 4.dp),
+                    .padding(top = TWENTY_DP, bottom = TWENTY_DP, start = TEN_DP, end = FOUR_DP),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -205,7 +212,7 @@ fun ApiKeyInputLayout(
 ) {
     var inputString by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.padding(MediumPadding)) {
+    Column(modifier = Modifier.padding(TWELVE_DP)) {
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -230,7 +237,7 @@ fun ApiKeyInputLayout(
             }
         )
 
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(SIX_DP))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -244,7 +251,7 @@ fun ApiKeyInputLayout(
                 Text(stringResource(id = R.string.dismiss))
             }
 
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(SIX_DP))
 
             Button(
                 onClick = {
@@ -258,81 +265,3 @@ fun ApiKeyInputLayout(
         }
     }
 }
-
-
-/**
- * NOTE: There's an ongoing issue where the keyboard is covered by the ModalBottomSheet in Material3
- * when using version `1.1.0-alpha08`
- * Link: https://issuetracker.google.com/issues/268380384
- */
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun ShowModelBottomSheet(
-//    newKeySelected: (String) -> Unit,
-//    onDismissRequested: () -> Unit
-//) {
-//    val coroutineScope = rememberCoroutineScope()
-//    val bottomSheetState = rememberModalBottomSheetState(
-//        skipPartiallyExpanded = false
-//    )
-//    var inputString by remember { mutableStateOf("") }
-//
-//    ModalBottomSheet(
-//        onDismissRequest = {
-//            coroutineScope.launch { bottomSheetState.hide() }
-//            onDismissRequested()
-//        },
-//        sheetState = bottomSheetState
-//    ) {
-//        Column(modifier = Modifier.padding(MediumPadding)) {
-//            TextField(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .background(
-//                        color = MaterialTheme.colorScheme.background,
-//                        shape = RectangleShape
-//                    ),
-//                value = inputString,
-//                textStyle = MaterialTheme.typography.titleMedium,
-//                colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent),
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-//                onValueChange = { value ->
-//                    inputString = value
-//                },
-//                placeholder = {
-//                    Text(
-//                        stringResource(id = R.string.enter_api_key),
-//                        style = MaterialTheme.typography.labelMedium,
-//                        color = Color.DarkGray,
-//                        fontStyle = FontStyle.Italic
-//                    )
-//                }
-//            )
-//
-//            Spacer(modifier = Modifier.height(36.dp))
-//
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.End
-//            ) {
-//                Button(
-//                    onClick = {
-//                        coroutineScope.launch { bottomSheetState.hide() }
-//                        onDismissRequested()
-//                    },
-//                ) {
-//                    Text(stringResource(id = R.string.dismiss))
-//                }
-//
-//                Spacer(modifier = Modifier.width(6.dp))
-//
-//                Button(
-//                    onClick = { newKeySelected(inputString) },
-//                    enabled = inputString.isNotEmpty()
-//                ) {
-//                    Text(stringResource(id = R.string.confirm))
-//                }
-//            }
-//        }
-//    }
-//}

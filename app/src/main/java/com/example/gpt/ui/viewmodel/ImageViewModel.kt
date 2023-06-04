@@ -2,7 +2,11 @@ package com.example.gpt.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+<<<<<<< HEAD
 import com.example.gpt.data.model.image.create.ImageCreateRequest
+=======
+import com.example.gpt.data.model.image.ImageCreateRequest
+>>>>>>> main
 import com.example.gpt.data.model.image.ImageMessageUi
 import com.example.gpt.data.model.image.edit.ImageEditRequest
 import com.example.gpt.data.repository.image.ImageRepository
@@ -34,12 +38,16 @@ class ImageViewModel @Inject constructor(
     val imageCreateMessageUiState
         get() = _imageCreateMessageUiState.asStateFlow()
 
+<<<<<<< HEAD
     private val _imageEditMessageUiState =
         MutableStateFlow<ImageMessageUiState>(ImageMessageUiState.Uninitialized)
     val imageEditMessageUiState
         get() = _imageEditMessageUiState.asStateFlow()
 
     fun getCreateImages(prompt: String, numOf: Int = 1) {
+=======
+    fun getImages(prompt: String, numOf: Int = 1) {
+>>>>>>> main
         val request = ImageCreateRequest(
             prompt = prompt, n = numOf
         )

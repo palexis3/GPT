@@ -17,12 +17,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.gpt.R
-import com.example.gpt.ui.theme.MediumPadding
+import com.example.gpt.ui.theme.EIGHT_DP
+import com.example.gpt.ui.theme.FOUR_DP
+import com.example.gpt.ui.theme.SIX_DP
+import com.example.gpt.ui.theme.TEN_DP
+import com.example.gpt.ui.theme.TWELVE_DP
 
 @Composable
 fun ShowLoading(
     horizontalAlignment: Alignment.Horizontal = Alignment.End,
-    padding: Dp = MediumPadding
+    padding: Dp = TWELVE_DP
 ) {
     Column(
         modifier =
@@ -35,25 +39,25 @@ fun ShowLoading(
         Card(
             modifier = Modifier
                 .width(200.dp)
-                .padding(4.dp),
+                .padding(FOUR_DP),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
+                defaultElevation = EIGHT_DP
             ),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(TWELVE_DP)
         ) {
             ShowCardHeader(
                 text = stringResource(id = R.string.gpt)
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(TEN_DP))
             DotsLoading(
                 modifier = Modifier.padding(
-                    start = 12.dp,
-                    top = 8.dp,
-                    bottom = 6.dp,
-                    end = 12.dp
+                    start = TWELVE_DP,
+                    top = EIGHT_DP,
+                    bottom = SIX_DP,
+                    end = TWELVE_DP
                 )
             )
         }

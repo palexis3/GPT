@@ -70,7 +70,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(
     ExperimentalMaterial3Api::class,
-    ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class,
+    ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class
 )
 @Composable
 fun ChatMessageScreen(

@@ -91,7 +91,7 @@ class LoggingInterceptor : Interceptor {
         val response: Response = chain.proceed(request)
         val t2 = System.nanoTime()
         Timber.tag("OkHttp").d(
-            java.lang.String.format(
+            String.format(
                 "<-- Received response for %s in %.1fms%n%s",
                 response.request.url,
                 (t2 - t1) / 1000000.0,

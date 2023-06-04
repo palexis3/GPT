@@ -6,6 +6,7 @@
     <string name="gpt">GPT</string>
     <string name="image_prompt">Type description for image</string>
     <string name="search_image">Search Image</string>
+    <string name="search">Search</string>
     <string name="num_of_image">Number of images</string>
     <string name="images_for">Image results for: %s</string>
     <string name="audio_permission_denied">Audio permission has been denied.</string>
@@ -22,6 +23,12 @@
     <string name="confirm">Confirm</string>
     <string name="enter_api_key">Enter API Key</string>
     <string name="edit">Edit</string>
+    <string name="upload_image">Upload Image</string>
+    <string name="take_photo">Take a photo</string>
+    <string name="image_edit_prompt">Description of the desired image(s). The maximum length is 1000 characters</string>
+    <string name="image_selected">Image selected : %s</string>
+    <string name="permission_denied">Permission has been denied!</string>
+    <string name="image_too_large">Sorry, image selected is too large. Try again</string>
     <string name="show_and_save_history">Show And Save Chat History</string>
     <string name="on">On</string>
     <string name="off">Off</string>

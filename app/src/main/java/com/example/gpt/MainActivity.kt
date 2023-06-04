@@ -24,8 +24,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.gpt.ui.composable.screen.AudioMessageScreen
 import com.example.gpt.ui.composable.screen.ChatMessageScreen
-import com.example.gpt.ui.composable.screen.ImageMessageScreen
+import com.example.gpt.ui.composable.screen.image.ImageMessageScreen
 import com.example.gpt.ui.composable.screen.SettingsScreen
+import com.example.gpt.ui.composable.screen.image.ImageEditScreen
 import com.example.gpt.ui.navigation.Screen
 import com.example.gpt.ui.theme.GptTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -81,7 +82,8 @@ fun ShowApp() {
                 Modifier.padding(innerPadding)
             ) {
                 composable(context.getString(Screen.Chat.route)) { ChatMessageScreen() }
-                composable(context.getString(Screen.Image.route)) { ImageMessageScreen() }
+//                composable(context.getString(Screen.Image.route)) { ImageMessageScreen() }
+                composable(context.getString(Screen.Image.route)) { ImageEditScreen() }
                 composable(context.getString(Screen.Audio.route)) { AudioMessageScreen() }
                 composable(context.getString(Screen.Settings.route)) { SettingsScreen() }
             }

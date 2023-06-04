@@ -18,6 +18,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -38,39 +40,32 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-<<<<<<< HEAD:app/src/main/java/com/example/gpt/ui/composable/screen/image/ImageMessageScreen.kt
-import androidx.compose.ui.unit.dp
-=======
 import androidx.compose.ui.unit.sp
->>>>>>> main:app/src/main/java/com/example/gpt/ui/composable/screen/ImageMessageScreen.kt
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.gpt.R
-<<<<<<< HEAD:app/src/main/java/com/example/gpt/ui/composable/screen/image/ImageMessageScreen.kt
-import com.example.gpt.ui.composable.ShowErrorCard
-import com.example.gpt.ui.composable.ShowImage
-import com.example.gpt.ui.composable.ShowLoading
-import com.example.gpt.ui.theme.MediumPadding
-=======
 import com.example.gpt.ui.composable.ShowMessageContent
 import com.example.gpt.ui.composable.ShowLoading
 import com.example.gpt.ui.theme.EIGHT_DP
 import com.example.gpt.ui.theme.FOUR_DP
 import com.example.gpt.ui.theme.SIX_DP
 import com.example.gpt.ui.theme.TWELVE_DP
->>>>>>> main:app/src/main/java/com/example/gpt/ui/composable/screen/ImageMessageScreen.kt
 import com.example.gpt.ui.viewmodel.ImageMessageUiState
 import com.example.gpt.ui.viewmodel.ImageViewModel
 
 @OptIn(
     ExperimentalComposeUiApi::class,
-    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class,
 )
 @Composable
 fun ImageMessageScreen(
@@ -129,38 +124,6 @@ fun ImageMessageScreen(
             )
         }
 
-<<<<<<< HEAD:app/src/main/java/com/example/gpt/ui/composable/screen/image/ImageMessageScreen.kt
-        Row(
-            modifier = Modifier.padding(MediumPadding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (query.trim().isNotEmpty()) {
-                ExposedDropdownMenuBox(
-                    modifier = Modifier
-                        .width(100.dp)
-                        .weight(1f),
-                    expanded = dropdownExpanded,
-                    onExpandedChange = { dropdownExpanded = !dropdownExpanded }
-                ) {
-                    TextField(
-                        modifier = Modifier
-                            .menuAnchor(),
-                        value = selectedNum.toString(),
-                        onValueChange = {},
-                        readOnly = true,
-                        label = {
-                            Text(
-                                stringResource(id = R.string.num_of_image),
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        shape = RoundedCornerShape(8.dp),
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded) },
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-=======
         if (query.trim().isNotEmpty()) {
             ExposedDropdownMenuBox(
                 modifier = Modifier.align(alignment = Alignment.End),
@@ -177,7 +140,6 @@ fun ImageMessageScreen(
                         Text(
                             stringResource(id = R.string.num_of_image),
                             fontWeight = FontWeight.Bold
->>>>>>> main:app/src/main/java/com/example/gpt/ui/composable/screen/ImageMessageScreen.kt
                         )
                     },
                     shape = RoundedCornerShape(EIGHT_DP),
@@ -207,27 +169,14 @@ fun ImageMessageScreen(
 
             Spacer(Modifier.height(SIX_DP))
 
-<<<<<<< HEAD:app/src/main/java/com/example/gpt/ui/composable/screen/image/ImageMessageScreen.kt
-                Button(
-                    onClick = {
-                        keyboardController?.hide()
-                        imageViewModel.getCreateImages(query.trim(), selectedNum)
-                        savedQuery = query
-                        query = ""
-                        imageViewModel.resetImageCreateUiFlow()
-                    }
-                ) {
-                    Text(text = stringResource(id = R.string.search_image))
-=======
             Button(
                 modifier = Modifier.align(alignment = Alignment.End),
                 onClick = {
                     keyboardController?.hide()
-                    imageViewModel.getImages(query.trim(), selectedNum)
+                    imageViewModel.getCreateImages(query.trim(), selectedNum)
                     savedQuery = query
                     query = ""
-                    imageViewModel.resetImageUiFlow()
->>>>>>> main:app/src/main/java/com/example/gpt/ui/composable/screen/ImageMessageScreen.kt
+                    imageViewModel.resetImageCreateUiFlow()
                 }
             ) {
                 Text(text = stringResource(id = R.string.search_image))
@@ -271,9 +220,6 @@ fun ImageListState(
                     ShowQueryText(context, text = savedQuery)
                 }
                 item {
-<<<<<<< HEAD:app/src/main/java/com/example/gpt/ui/composable/screen/image/ImageMessageScreen.kt
-                   ShowErrorCard()
-=======
                     ShowMessageContent(
                         text = stringResource(id = R.string.error),
                         modifier = Modifier.padding(
@@ -287,7 +233,6 @@ fun ImageListState(
                             fontSize = 18.sp
                         )
                     )
->>>>>>> main:app/src/main/java/com/example/gpt/ui/composable/screen/ImageMessageScreen.kt
                 }
             }
             is ImageMessageUiState.Success -> {
@@ -315,8 +260,6 @@ fun ShowQueryText(context: Context, text: String) {
         fontStyle = FontStyle.Italic
     )
 }
-<<<<<<< HEAD:app/src/main/java/com/example/gpt/ui/composable/screen/image/ImageMessageScreen.kt
-=======
 
 @Composable
 fun ShowImage(url: String) {
@@ -341,4 +284,3 @@ fun ShowImage(url: String) {
         }
     }
 }
->>>>>>> main:app/src/main/java/com/example/gpt/ui/composable/screen/ImageMessageScreen.kt

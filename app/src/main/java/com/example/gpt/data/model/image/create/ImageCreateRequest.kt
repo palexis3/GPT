@@ -1,4 +1,4 @@
-package com.example.gpt.data.model.image
+package com.example.gpt.data.model.image.create
 
 data class ImageCreateRequest(
     val prompt: String,

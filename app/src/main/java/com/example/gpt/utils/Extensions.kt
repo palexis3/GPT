@@ -1,5 +1,5 @@
 package com.example.gpt.utils
-
+[]
 fun String.mask(): String {
     val numOfCharsToMask = if (this.isNotEmpty() && length > 5) {
         5

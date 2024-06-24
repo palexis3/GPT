@@ -7,7 +7,7 @@ buildscript {
         moshi_version = '1.14.0'
         retrofit_version = '2.9.0'
         logging_interceptor = '4.10.0'
-        coil_compose_version = '2.2.2'
+        coil_compose_version = '2.3.0'
         lifecycle_version = '2.4.0'
         lifecycle_compose_version = '2.6.0-alpha02'
         hilt_navigation_version = '1.0.0'

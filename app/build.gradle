@@ -87,6 +87,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
 
     // Coil - Image Loading
+    implementation "io.coil-kt:coil:$coil_compose_version"
     implementation "io.coil-kt:coil-compose:$coil_compose_version"
 
     // Timber - Logging
@@ -99,6 +100,9 @@ dependencies {
 
     // Datastore - Preferences
     implementation "androidx.datastore:datastore-preferences:$datastore_version"
+
+    // Image Compression library
+    implementation 'id.zelory:compressor:3.0.1'
 
     // Database - Room
     implementation "androidx.room:room-runtime:$room_version"

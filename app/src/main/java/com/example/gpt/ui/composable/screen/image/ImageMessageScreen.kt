@@ -1,4 +1,4 @@
-package com.example.gpt.ui.composable.screen
+package com.example.gpt.ui.composable.screen.image
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -65,7 +65,7 @@ import com.example.gpt.ui.viewmodel.ImageViewModel
 
 @OptIn(
     ExperimentalComposeUiApi::class,
-    ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class
+    ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class,
 )
 @Composable
 fun ImageMessageScreen(
@@ -80,7 +80,7 @@ fun ImageMessageScreen(
     var dropdownExpanded by remember { mutableStateOf(false) }
     var selectedNum by remember { mutableStateOf(1) }
 
-    val imageMessageUiState: ImageMessageUiState by imageViewModel.imageMessageUiState.collectAsStateWithLifecycle()
+    val imageMessageUiState: ImageMessageUiState by imageViewModel.imageCreateMessageUiState.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -173,10 +173,10 @@ fun ImageMessageScreen(
                 modifier = Modifier.align(alignment = Alignment.End),
                 onClick = {
                     keyboardController?.hide()
-                    imageViewModel.getImages(query.trim(), selectedNum)
+                    imageViewModel.getCreateImages(query.trim(), selectedNum)
                     savedQuery = query
                     query = ""
-                    imageViewModel.resetImageUiFlow()
+                    imageViewModel.resetImageCreateUiFlow()
                 }
             ) {
                 Text(text = stringResource(id = R.string.search_image))

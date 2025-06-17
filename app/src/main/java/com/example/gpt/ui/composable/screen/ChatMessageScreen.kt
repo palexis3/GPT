@@ -49,7 +49,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gpt.R
 import com.example.gpt.data.model.LoadingMessageUi
@@ -68,10 +67,7 @@ import com.example.gpt.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-@OptIn(
-    ExperimentalMaterial3Api::class,
-    ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class,
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatMessageScreen(
     chatViewModel: ChatViewModel = hiltViewModel(),
@@ -130,7 +126,7 @@ fun ChatMessageScreen(
             chatMessageUiState,
             onProcessed = { chatMessage ->
                 if (messageList.last() is LoadingMessageUi) {
-                    messageList.removeLast()
+                    messageList.removeAt(messageList.lastIndex)
                 }
                 messageList.add(chatMessage)
             },

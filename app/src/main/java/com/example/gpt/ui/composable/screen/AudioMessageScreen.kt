@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gpt.R
 import com.example.gpt.ui.composable.ShowCardHeader
@@ -63,7 +62,6 @@ import com.example.gpt.utils.fileIsNotEmpty
 import com.example.gpt.utils.hasMicrophone
 import java.io.File
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun AudioMessageScreen(
     audioViewModel: AudioViewModel = hiltViewModel()

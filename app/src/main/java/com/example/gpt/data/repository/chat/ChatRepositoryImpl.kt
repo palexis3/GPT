@@ -8,6 +8,8 @@ import com.example.gpt.data.model.chat.toChatMessageUi
 import com.example.gpt.data.model.chat.toChatMessagesUi
 import com.example.gpt.data.remote.OpenAIApi
 import com.example.gpt.utils.MySettingPreferences
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class ChatRepositoryImpl @Inject constructor(
@@ -91,7 +94,9 @@ class ChatRepositoryImpl @Inject constructor(
             emit(localChatMessageUi)
         }
 
-    override suspend fun saveChatMessages(chatMessagesLocal: ChatMessagesLocal) {
-        dao.insertLocalChatMessage(chatMessagesLocal)
+    override fun saveChatMessages(chatMessagesLocal: ChatMessagesLocal) {
+        CoroutineScope(Dispatchers.IO).launch {
+            dao.insertLocalChatMessage(chatMessagesLocal)
+        }
     }
 }

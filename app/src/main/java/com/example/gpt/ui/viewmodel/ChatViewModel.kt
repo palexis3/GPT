@@ -20,9 +20,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed interface ChatMessageUiState {
-    object Loading : ChatMessageUiState
-    object Error : ChatMessageUiState
-    object Uninitialized : ChatMessageUiState
+    data object Loading : ChatMessageUiState
+    data object Error : ChatMessageUiState
+    data object Uninitialized : ChatMessageUiState
     data class Success(val chatMessageUi: ChatMessageUi) : ChatMessageUiState
 }
 

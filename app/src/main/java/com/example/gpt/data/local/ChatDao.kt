@@ -16,5 +16,5 @@ interface ChatDao {
     fun getLocalChatMessage(prompt: String): ChatMessagesLocal?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertLocalChatMessage(message: ChatMessagesLocal)
+    fun insertLocalChatMessage(message: ChatMessagesLocal)
 }

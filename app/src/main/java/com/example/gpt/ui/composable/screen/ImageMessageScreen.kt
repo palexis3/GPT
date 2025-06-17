@@ -36,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -50,7 +49,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.gpt.R
@@ -63,10 +61,7 @@ import com.example.gpt.ui.theme.TWELVE_DP
 import com.example.gpt.ui.viewmodel.ImageMessageUiState
 import com.example.gpt.ui.viewmodel.ImageViewModel
 
-@OptIn(
-    ExperimentalComposeUiApi::class,
-    ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class,)
 @Composable
 fun ImageMessageScreen(
     imageViewModel: ImageViewModel = hiltViewModel()

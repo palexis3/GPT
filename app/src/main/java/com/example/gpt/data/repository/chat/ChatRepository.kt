@@ -11,6 +11,5 @@ interface ChatRepository {
     fun getChatMessageFromLocal(prompt: String): Flow<ChatMessageUi?>
     fun getChatMessageFromApi(request: ChatCompletionRequest): Flow<ChatMessageUi>
     fun getChatMessage(request: ChatCompletionRequest): Flow<ChatMessageUi>
-
-    suspend fun saveChatMessages(chatMessagesLocal: ChatMessagesLocal)
+    fun saveChatMessages(chatMessagesLocal: ChatMessagesLocal)
 }

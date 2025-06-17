@@ -42,7 +42,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import com.example.gpt.R
 import com.example.gpt.ui.theme.EIGHT_DP
 import com.example.gpt.ui.theme.FORTY_EIGHT_DP
@@ -53,7 +52,6 @@ import com.example.gpt.ui.theme.TWELVE_DP
 import com.example.gpt.ui.theme.TWENTY_DP
 import com.example.gpt.utils.mask
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel()
